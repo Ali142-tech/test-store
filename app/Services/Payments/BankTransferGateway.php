@@ -26,7 +26,8 @@ class BankTransferGateway implements PaymentGateway
 
     public function isEnabled(string $audience): bool
     {
-        return (bool) StoreSetting::get('payment_bank_enabled', '1');
+        // Never offer bank transfer until customers can actually be told where to pay.
+        return (bool) StoreSetting::get('payment_bank_enabled', '1') && trim((string) StoreSetting::get('bank_account_number')) !== '';
     }
 
     public function initiate(Order $order, Payment $payment): void

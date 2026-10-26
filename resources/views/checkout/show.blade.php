@@ -76,7 +76,7 @@
                     @forelse ($methods as $code => $g)
                         <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4">
                             <input type="radio" name="payment_method" value="{{ $code }}" class="mt-1" @checked(old('payment_method', $loop->first ? $code : null) === $code) required>
-                            <span><span class="font-medium">{{ $g->label() }}</span><span class="block text-sm text-ink-soft">{{ $g->description() }}</span></span>
+                            <span><span class="font-medium">{{ $g->label() }}</span><span class="block text-sm text-ink-soft">{{ $g->description() }}</span>@if ($code === 'bank_transfer')<span class="mt-2 block rounded-xl bg-mist p-3 text-sm"><span class="block font-medium">Pay into this account, then we confirm your order:</span>@foreach (\App\Services\Payments\BankTransferGateway::instructions() as $label => $value)<span class="block text-ink-soft">{{ $label }}: <span class="text-ink">{{ $value }}</span></span>@endforeach<span class="mt-1 block text-xs text-ink-soft">You will get your order reference after placing the order; use it as the payment reference. No card details are needed.</span></span>@endif</span>
                         </label>
                     @empty
                         <p class="text-sm text-danger">No payment methods are currently available. Please contact us.</p>

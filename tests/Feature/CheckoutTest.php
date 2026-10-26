@@ -303,3 +303,16 @@ it('shows the product photo (colour-specific when available) in the cart and che
     $this->post('/cart/add', ['variant_id' => $a->id, 'quantity' => 1]);
     $this->get('/cart')->assertSee('products/main.webp', false); // no own photo -> product's main photo
 });
+
+it('hides bank transfer until a bank account number is configured, and shows the account at checkout once it is', function () {
+    StoreSetting::updateOrCreate(['key' => 'bank_account_number'], ['value' => '']);
+    \Illuminate\Support\Facades\Cache::flush();
+    addToCart($this, $this->variant, 1);
+    $this->get('/checkout')->assertDontSee('Bank transfer');
+    $this->post('/checkout', checkoutPayload(['payment_method' => 'bank_transfer']))->assertSessionHasErrors('checkout');
+
+    StoreSetting::updateOrCreate(['key' => 'bank_account_number'], ['value' => 'PK36SCBL0000001123456702']);
+    StoreSetting::updateOrCreate(['key' => 'bank_name'], ['value' => 'Demo Bank']);
+    \Illuminate\Support\Facades\Cache::flush();
+    $this->get('/checkout')->assertSee('Bank transfer')->assertSee('PK36SCBL0000001123456702')->assertSee('No card details are needed');
+});

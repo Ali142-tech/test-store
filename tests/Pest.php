@@ -40,7 +40,7 @@ function seedShipping(): ShippingZone
     $zone = ShippingZone::create(['name' => 'PK']);
     $zone->methods()->create(['name' => 'Standard', 'audience' => 'retail', 'base_rate' => 250, 'free_over' => 5000]);
     $zone->methods()->create(['name' => 'Freight', 'audience' => 'wholesale', 'base_rate' => 500, 'free_over' => 100000]);
-    foreach (['payment_cod_enabled' => '1', 'payment_bank_enabled' => '1', 'payment_cod_wholesale' => '0', 'wholesale_min_order_value' => '0'] as $k => $v) {
+    foreach (['payment_cod_enabled' => '1', 'payment_bank_enabled' => '1', 'bank_account_number' => 'PK00TEST0000000000000001', 'bank_name' => 'Demo Bank', 'payment_cod_wholesale' => '0', 'wholesale_min_order_value' => '0'] as $k => $v) {
         StoreSetting::updateOrCreate(['key' => $k], ['value' => $v]);
     }
 
