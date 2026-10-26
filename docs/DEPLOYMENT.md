@@ -31,11 +31,9 @@ php artisan migrate --force        # safe, additive. Take a backup first (sectio
 php artisan db:seed --class=RolesSeeder --force
 php artisan db:seed --class=ContentSeeder --force   # placeholder policies/settings: EDIT them afterwards
 ```
-**Create the first admin** (no hard-coded credentials):
+**Create the first admin** (no hard-coded credentials; the password is typed at a hidden prompt):
 ```bash
-php artisan tinker
->>> $u = App\Models\User::forceCreate(['name'=>'Owner','email'=>'you@example.com','password'=>bcrypt('<long random>'),'email_verified_at'=>now()]);
->>> $u->assignRole('Super Admin');
+php artisan store:create-admin you@yourdomain.com --name="Your Name" --store-name="Your Store" --contact-email=support@yourdomain.com
 ```
 Then sign in at `/admin`, change the password, and create other staff under *Customers > Users* (roles: Store Manager, Inventory Manager, Order Manager, Customer Support, Wholesale Manager).
 
