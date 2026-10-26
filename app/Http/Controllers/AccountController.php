@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Support\SafeMail;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ReturnRequest;
@@ -61,7 +62,7 @@ class AccountController extends Controller
             $user->email = $data['email'];
             $user->email_verified_at = null;
             $user->save();
-            $user->sendEmailVerificationNotification();
+            SafeMail::run(fn () => $user->sendEmailVerificationNotification());
         } else {
             $user->save();
         }

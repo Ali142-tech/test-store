@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Cart\CartService;
+use App\Support\SafeMail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -61,7 +62,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($data + ['marketing_consent' => $request->boolean('marketing_consent')]);
-        event(new Registered($user));
+        SafeMail::run(fn () => event(new Registered($user))); // verification email: never block sign-up
 
         $guestToken = $request->session()->get('cart_token');
         Auth::login($user);

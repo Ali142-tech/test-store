@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Support\SafeMail;
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
@@ -22,8 +23,8 @@ class VerificationController extends Controller
 
     public function resend(Request $request)
     {
-        $request->user()->sendEmailVerificationNotification();
+        $sent = SafeMail::run(fn () => $request->user()->sendEmailVerificationNotification());
 
-        return back()->with('status', 'Verification link sent.');
+        return back()->with('status', $sent ? 'Verification link sent.' : 'We could not send the email right now. Please try again in a few minutes.');
     }
 }

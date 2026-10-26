@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Wholesale;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\SafeMail;
 use App\Models\WholesaleApplication;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -40,7 +41,7 @@ class WholesaleController extends Controller
 
         if (! $user) {
             $user = User::create(['name' => $data['name'], 'email' => $data['email'], 'phone' => $data['contact_phone'], 'password' => $data['password']]);
-            event(new Registered($user));
+            SafeMail::run(fn () => event(new Registered($user)));
             Auth::login($user);
             $request->session()->regenerate();
         }

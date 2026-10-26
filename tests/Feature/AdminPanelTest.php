@@ -94,3 +94,22 @@ it('does not expose the private documents directory over the public web root', f
     expect(config('filesystems.disks.local.root'))->toBe(storage_path('app/private'))
         ->and(config('filesystems.disks.public.root'))->toBe(storage_path('app/public'));
 });
+
+it('signs staff in through the real admin login form, and rejects bad passwords and customers', function () {
+    $staff = User::factory()->create(['password' => 'S3cure-pass!']);
+    $staff->assignRole('Order Manager');
+    $customer = User::factory()->create(['password' => 'S3cure-pass!']);
+
+    \Livewire\Livewire::test(\Filament\Auth\Pages\Login::class)
+        ->fillForm(['email' => $staff->email, 'password' => 'wrong'])->call('authenticate')->assertHasFormErrors(['email']);
+    $this->assertGuest();
+
+    \Livewire\Livewire::test(\Filament\Auth\Pages\Login::class)
+        ->fillForm(['email' => $staff->email, 'password' => 'S3cure-pass!'])->call('authenticate')->assertHasNoFormErrors();
+    $this->assertAuthenticatedAs($staff);
+
+    auth()->logout();
+    \Livewire\Livewire::test(\Filament\Auth\Pages\Login::class)
+        ->fillForm(['email' => $customer->email, 'password' => 'S3cure-pass!'])->call('authenticate');
+    $this->get('/admin')->assertRedirect(); // a customer never gets into the panel
+});

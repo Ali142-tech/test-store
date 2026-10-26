@@ -5,6 +5,7 @@ namespace App\Services\Wholesale;
 use App\Mail\QuoteMail;
 use App\Models\Quote;
 use App\Models\User;
+use App\Support\SafeMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use InvalidArgumentException;
@@ -41,7 +42,7 @@ class QuoteService
             ]);
         });
 
-        Mail::to($quote->user->email)->send(new QuoteMail($quote->fresh()));
+        SafeMail::run(fn () => Mail::to($quote->user->email)->send(new QuoteMail($quote->fresh())));
     }
 
     public function reject(Quote $quote, User $by, ?string $note): void

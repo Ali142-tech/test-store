@@ -5,6 +5,7 @@ namespace App\Services\Wholesale;
 use App\Mail\WholesaleDecisionMail;
 use App\Models\User;
 use App\Models\WholesaleApplication;
+use App\Support\SafeMail;
 use App\Services\Audit\AuditLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -35,6 +36,6 @@ class WholesaleApprovalService
             AuditLogger::log("Wholesale.{$status}", $app, ['user_id' => $app->user_id, 'notes' => $notes]);
         });
 
-        Mail::to($app->user->email)->send(new WholesaleDecisionMail($app->fresh()));
+        SafeMail::run(fn () => Mail::to($app->user->email)->send(new WholesaleDecisionMail($app->fresh())));
     }
 }

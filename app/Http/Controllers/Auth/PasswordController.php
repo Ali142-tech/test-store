@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\SafeMail;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -20,7 +21,7 @@ class PasswordController extends Controller
     public function sendLink(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-        Password::sendResetLink($request->only('email'));
+        SafeMail::run(fn () => Password::sendResetLink($request->only('email')));
 
         // Same response whether or not the account exists (no user enumeration).
         return back()->with('status', 'If that email is registered, a reset link is on its way.');
