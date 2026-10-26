@@ -81,7 +81,7 @@ it('offers the review form on the product page only to customers who received th
     $v = makeVariant(['wholesale_enabled' => false]);
     $url = route('product', $v->product);
 
-    $this->get($url)->assertSee('Only customers who have received this product can review it')->assertDontSee('Submit review');
+    $this->get($url)->assertSee('Only customers who have received this product can review it.')->assertDontSee('Submit review');
 
     $u = \App\Models\User::factory()->create();
     $this->actingAs($u)->post('/cart/add', ['variant_id' => $v->id, 'quantity' => 1]);

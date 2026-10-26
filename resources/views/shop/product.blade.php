@@ -189,7 +189,7 @@ function productPage(variants, symbol) {
                     <button class="btn btn-primary w-fit">Submit review</button>
                 </form>
             @else
-                <p class="text-ink-soft">Only customers who have received this product can review it, so every review here comes from a real buyer.</p>
+                <p class="text-ink-soft">Only customers who have received this product can review it. Reviews tagged "Sample review" are demo content.</p>
             @endif
         </div>
     </section>
