@@ -171,14 +171,15 @@ function productPage(variants, symbol) {
             <div class="mt-4 border-b border-line pb-4">
                 <p class="text-sm"><span class="text-amber-500">{{ str_repeat('★', $r->rating) }}</span> <strong>{{ $r->title }}</strong></p>
                 <p class="mt-1 text-sm text-ink-soft">{{ $r->body }}</p>
-                <p class="mt-1 text-xs text-ink-soft">{{ $r->user->name }} @if ($r->is_verified_purchase) · Verified purchase @endif @if ($r->is_sample) <span class="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">Sample review</span> @endif</p>
+                <p class="mt-1 text-xs text-ink-soft">{{ $r->user->name }} @if ($r->is_verified_purchase) · Verified purchase @endif</p>
             </div>
         @empty
             <p class="mt-3 text-sm text-ink-soft">No reviews yet.</p>
         @endforelse
 
+        @if ($canReview)
         <div class="mt-6 rounded-2xl bg-mist p-5 text-sm">
-            @if ($canReview)
+
                 <p class="font-semibold">{{ $myReview ? 'Update your review' : 'Write a review' }}</p>
                 @if ($myReview && $myReview->status === 'pending')<p class="mt-1 text-ink-soft">Your review is awaiting approval.</p>@endif
                 <form method="post" action="{{ route('account.reviews.store', $product) }}" class="mt-3 grid gap-3 sm:grid-cols-[8rem_1fr]">@csrf
@@ -188,10 +189,8 @@ function productPage(variants, symbol) {
                     <textarea name="body" rows="3" class="field sm:col-span-2" placeholder="What did you think of it?" maxlength="2000">{{ $myReview->body ?? '' }}</textarea>
                     <button class="btn btn-primary w-fit">Submit review</button>
                 </form>
-            @else
-                <p class="text-ink-soft">Only customers who have received this product can review it. Reviews tagged "Sample review" are demo content.</p>
-            @endif
         </div>
+        @endif
     </section>
 
     @if ($recent->isNotEmpty())
