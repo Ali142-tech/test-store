@@ -32,6 +32,11 @@ function productPage(variants, symbol) {
         get gallery() { return this.v ? this.v.images : []; },
         get v() { return this.variants[this.selected]; },
         get minQty() { return this.v ? this.v.moq : 1; },
+        get q() { const n = parseInt(this.qty, 10); return Number.isFinite(n) && n > 0 ? n : 1; },
+        // Unit price for the chosen quantity: wholesale tiers (only ever sent to approved wholesale buyers) else the variant price.
+        get unit() { const t = (this.v.tiers || []).filter(t => this.q >= t.min && (t.max === null || this.q <= t.max)).sort((a, b) => b.min - a.min)[0]; return t ? Number(t.price) : Number(this.v.price); },
+        get total() { return this.unit * this.q; },
+        clamp() { this.qty = Math.min(Math.max(this.q, this.minQty), Math.max(this.v.available, 1)); },
         init() { const first = this.variants.findIndex(x => x.available > 0); if (first > 0) this.selected = first; this.qty = this.minQty; },
         pick(i) { this.selected = i; this.img = 0; this.qty = Math.min(Math.max(this.qty, this.minQty), Math.max(this.v.available, 1)); },
         money(n) { return symbol + ' ' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); },
@@ -76,11 +81,13 @@ function productPage(variants, symbol) {
             @endif
 
             <div class="mt-5 flex items-baseline gap-3">
-                <span class="text-3xl font-semibold" x-text="money(v.price)"></span>
-                <span class="text-lg text-ink-soft line-through" x-show="Number(v.price) < Number(v.regular_price)" x-text="money(v.regular_price)"></span>
-                <span class="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent" x-show="Number(v.price) < Number(v.regular_price)"
-                      x-text="Math.round((1 - v.price / v.regular_price) * 100) + '% off'"></span>
+                <span class="text-3xl font-semibold" x-text="money(unit)"></span>
+                <span class="text-lg text-ink-soft line-through" x-show="unit < Number(v.regular_price)" x-text="money(v.regular_price)"></span>
+                <span class="rounded-full bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent" x-show="unit < Number(v.regular_price)"
+                      x-text="Math.round((1 - unit / v.regular_price) * 100) + '% off'"></span>
+                <span class="text-sm text-ink-soft">each</span>
             </div>
+            <p class="mt-1 text-sm" x-show="q > 1" x-cloak><span x-text="q + ' × ' + money(unit) + ' ='"></span> <strong class="text-lg" x-text="money(total)"></strong></p>
             <p class="mt-3 text-ink-soft">{{ $product->short_description }}</p>
 
             @if ($variants->count() > 1)
@@ -115,9 +122,9 @@ function productPage(variants, symbol) {
                 @csrf
                 <input type="hidden" name="variant_id" :value="v.id">
                 <div class="flex items-center rounded-full border border-line">
-                    <button type="button" class="h-11 w-11" @click="qty = Math.max(minQty, qty - 1)" aria-label="Decrease">−</button>
-                    <input type="number" name="quantity" x-model.number="qty" :min="minQty" :max="v.available" class="w-14 border-0 bg-transparent text-center focus:outline-none" aria-label="Quantity">
-                    <button type="button" class="h-11 w-11" @click="qty = Math.min(v.available, qty + 1)" aria-label="Increase">+</button>
+                    <button type="button" class="h-11 w-11" @click="qty = Math.max(minQty, q - 1)" aria-label="Decrease">−</button>
+                    <input type="number" name="quantity" x-model.number="qty" @change="clamp()" @blur="clamp()" :min="minQty" :max="v.available" class="w-14 border-0 bg-transparent text-center focus:outline-none" aria-label="Quantity">
+                    <button type="button" class="h-11 w-11" @click="qty = Math.min(v.available, q + 1)" aria-label="Increase">+</button>
                 </div>
                 <button class="btn btn-primary flex-1 disabled:opacity-40" :disabled="v.available === 0">Add to cart</button>
                 <button class="btn btn-accent disabled:opacity-40" name="buy_now" value="1" :disabled="v.available === 0">Buy now</button>
@@ -170,21 +177,6 @@ function productPage(variants, symbol) {
             <p class="mt-3 text-sm text-ink-soft">No reviews yet.</p>
         @endforelse
     </section>
-
-    @if ($externalReviews->isNotEmpty())
-        <section class="mt-10 rounded-3xl bg-mist p-6">
-            <h2 class="text-lg font-semibold">Reviews from other Pakistani stores</h2>
-            <p class="mt-1 text-xs text-ink-soft">These are public reviews of this product on {{ $externalReviews->first()->source }}, shown for reference. They are not reviews of orders placed with us and are not included in our rating.</p>
-            <div class="mt-4 grid gap-4 md:grid-cols-2">
-                @foreach ($externalReviews as $er)
-                    <figure class="rounded-2xl bg-white p-4"><p class="text-amber-500">{{ str_repeat('★', $er->rating) }}<span class="text-ink-soft/30">{{ str_repeat('★', 5 - $er->rating) }}</span></p>
-                        <blockquote class="mt-1 text-sm" dir="auto">{{ $er->body }}</blockquote>
-                        <figcaption class="mt-2 text-xs text-ink-soft">{{ $er->displayName() }}@if ($er->reviewed_on) · {{ $er->reviewed_on->format('d M Y') }}@endif · via {{ $er->source }}</figcaption></figure>
-                @endforeach
-            </div>
-            @if ($externalReviews->first()->source_url)<p class="mt-3 text-xs"><a class="underline" rel="nofollow noopener" target="_blank" href="{{ $externalReviews->first()->source_url }}">See all reviews at the source</a></p>@endif
-        </section>
-    @endif
 
     @if ($recent->isNotEmpty())
         <section class="mt-14">

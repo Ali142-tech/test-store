@@ -6,7 +6,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\DeviceBrand;
 use App\Models\DeviceModel;
-use App\Models\ExternalReview;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
@@ -16,11 +15,10 @@ use Illuminate\Support\Str;
 /**
  * Seeds the REAL Pakistani market catalogue collected by `php artisan catalog:scrape`
  * (database/seed-assets/catalog.json + images/): product names, brands, PKR prices per colour, the specifications
- * published for each product, per-colour photo galleries, per-colour availability, and the public reviews shown for
- * the product on the source site (stored as clearly attributed EXTERNAL reviews, never as this store's own).
+ * published for each product, per-colour photo galleries, and per-colour availability. Reviews from other sites are NOT imported.
  *
  * Source: PriceOye. Prices change often: re-run the scraper or edit in Admin > Products before selling.
- * Images/reviews belong to their owners: confirm you may use them on a live store (source_url is kept).
+* Images belong to their owners: confirm you may use them on a live store (source_url is kept).
  *
  * Deliberately NOT invented: sale prices, our own ratings, sales counts, warranty/authenticity claims, wholesale
  * tiers, cost prices. Opening stock is unknown, so in-stock variants start at OPENING_STOCK as a placeholder
@@ -119,12 +117,6 @@ class RealCatalogSeeder extends Seeder
                 $product->deviceModels()->syncWithoutDetaching($byPort[$port]->all());
             }
 
-            foreach ($row['reviews'] ?? [] as $rv) {
-                ExternalReview::create([
-                    'product_id' => $product->id, 'source' => 'PriceOye', 'source_url' => $row['page'], 'reviewer_name' => $rv['name'] ?: 'Customer',
-                    'rating' => max(1, min(5, (int) $rv['rating'])), 'body' => $rv['text'], 'reviewed_on' => $rv['date'] ?: null,
-                ]);
-            }
         }
     }
 

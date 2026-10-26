@@ -52,7 +52,6 @@ class ProductController extends Controller
 
         return view('shop.product', [
             'recent' => $recent,
-            'externalReviews' => $product->externalReviews()->limit(5)->get(),
             'product' => $product,
             'variants' => $variants,
             'related' => $related,

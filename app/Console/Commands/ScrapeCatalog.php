@@ -21,7 +21,7 @@ class ScrapeCatalog extends Command
 {
     protected $signature = 'catalog:scrape {--limit=0 : Max products per listing page (0 = all)} {--no-images}';
 
-    protected $description = 'Scrape real PriceOye listings, colour galleries, specs and reviews into database/seed-assets';
+    protected $description = 'Scrape real PriceOye listings, colour galleries and specs into database/seed-assets';
 
     private const IMAGE_BASE = 'https://images.priceoye.pk/';
 
@@ -161,22 +161,10 @@ class ScrapeCatalog extends Command
             }
         }
 
-        // ---- reviews shown on the source product page (public)
-        $reviews = [];
-        foreach (array_slice((array) ($d['ratings_data']['data'] ?? []), 0, 5) as $rv) {
-            $text = trim((string) ($rv['description'] ?? ''));
-            if ($text === '' || empty($rv['rating'])) {
-                continue;
-            }
-            $reviews[] = ['name' => trim((string) ($rv['fullname'] ?? '')), 'rating' => (int) $rv['rating'], 'text' => $text, 'date' => substr((string) ($rv['date_create'] ?? ''), 0, 10)];
-        }
-
         return [
             'name' => $it['name'], 'category' => $it['category'], 'page' => $it['page'], 'price' => $it['price'],
             'brand' => html_entity_decode((string) ($d['brand'] ?? $data['brand_name'] ?? '')) ?: null,
             'specs' => $specs, 'colors' => $colors, 'fallback_image' => $fallback,
-            'source_rating' => ['average' => (float) ($d['average_rating'] ?? 0), 'count' => (int) ($d['total_ratings'] ?? 0)],
-            'reviews' => $reviews,
         ];
     }
 

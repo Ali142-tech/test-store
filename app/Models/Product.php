@@ -92,11 +92,6 @@ class Product extends Model
             ->wherePivot('kind', 'related');
     }
 
-    public function externalReviews(): HasMany
-    {
-        return $this->hasMany(ExternalReview::class)->latest('reviewed_on');
-    }
-
     /** Everything a product card needs, in one eager-loaded query set (incl. colour options). */
     public function scopeForCards(Builder $q): Builder
     {

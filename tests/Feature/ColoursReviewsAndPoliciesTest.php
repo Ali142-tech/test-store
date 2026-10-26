@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\ExternalReview;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\ProductImage;
@@ -47,16 +46,12 @@ it('is not marked out of stock when only some colours are sold out', function ()
     $this->get('/shop')->assertSee('Palette Case')->assertDontSee('Out of stock');
 });
 
-it('shows reviews from other stores with attribution, but never counts them as our rating', function () {
-    $p = colourProduct();
-    ExternalReview::create(['product_id' => $p->id, 'source' => 'PriceOye', 'source_url' => 'https://priceoye.pk/x', 'reviewer_name' => 'Muzamil Jamali', 'rating' => 5, 'body' => 'Great charger', 'reviewed_on' => '2025-02-03']);
-
-    $html = $this->get(route('product', $p))->assertOk()
-        ->assertSee('Reviews from other Pakistani stores')->assertSee('Great charger')->assertSee('Muzamil J.')->assertSee('via PriceOye')
-        ->assertSee('not reviews of orders placed with us')->getContent();
-
-    expect($html)->not->toContain('Muzamil Jamali')->not->toContain('aggregateRating')->toContain('No reviews yet'); // our own review section is still empty
-    $this->get('/shop')->assertDontSee('(1)'); // card rating comes only from our own reviews
+it('never shows reviews or links from other stores', function () {
+    $html = $this->get(route('product', colourProduct()))->assertOk()->getContent();
+    expect($html)->not->toContain('other Pakistani stores')->not->toContain('priceoye')->not->toContain('PriceOye')->not->toContain('aggregateRating');
+    foreach (['/', '/shop'] as $u) {
+        expect($this->get($u)->getContent())->not->toContain('priceoye');
+    }
 });
 
 it('seeds complete policy pages that render with live store details', function () {
