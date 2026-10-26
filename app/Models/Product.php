@@ -63,12 +63,12 @@ class Product extends Model
 
     public function variants(): HasMany
     {
-        return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
+        return $this->hasMany(ProductVariant::class)->orderBy('sort_order')->chaperone();
     }
 
     public function defaultVariant(): HasOne
     {
-        return $this->hasOne(ProductVariant::class)->where('is_active', true)->orderByDesc('is_default')->orderBy('price');
+        return $this->hasOne(ProductVariant::class)->where('is_active', true)->orderByDesc('is_default')->orderBy('price')->chaperone();
     }
 
     public function images(): HasMany

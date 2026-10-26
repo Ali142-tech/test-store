@@ -1,66 +1,33 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Voltix: mobile accessories store (retail + wholesale)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 12 monolith: Blade + Tailwind 4 + Alpine storefront, Filament 4 admin at `/admin`, MySQL, Pest tests. "Voltix" is a placeholder brand name (Admin > Store settings).
 
-## About Laravel
+## Run locally
+```bash
+composer install && npm install
+cp .env.example .env && php artisan key:generate       # set DB_* (MySQL); create the databases `store` and `store_testing`
+php artisan migrate --seed                              # demo catalog + roles + default shipping (non-production only)
+npm run build                                           # or `npm run dev`
+php artisan storage:link
+php artisan serve                                       # http://127.0.0.1:8000
+```
+Run the queue worker for emails (`php artisan queue:work`) or set `QUEUE_CONNECTION=sync` while developing; `MAIL_MAILER=log` writes mail to `storage/logs`.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Admin access (local demo only):** `admin@voltix.test` / `password` is created by the seeder **only when APP_ENV is not production**. In production create the first admin with the steps in `docs/DEPLOYMENT.md`; no credentials are hard-coded.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tests
+```bash
+./vendor/bin/pest          # ~160 tests; uses the MySQL database `store_testing`
+npm run build              # production asset build
+composer audit && npm audit
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Documentation
+- `docs/ARCHITECTURE.md`: decisions, schema, workflows
+- `docs/DEPLOYMENT.md`: Nginx / queues / scheduler / backups / rollback (configs in `deploy/`)
+- `docs/PAYMENTS.md`: what payment methods are real, and how to add gateways
+- `docs/REPORTING.md`: dashboard metric definitions
+- `PROJECT_PROGRESS.md`: status, known gaps, next steps
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Key rules enforced on the server
+Prices, discounts, shipping, tax and totals are always recomputed server-side (`OrderCalculator`, `PriceResolver`). Wholesale pricing/MOQ/quotes require an *approved* application (`User::isApprovedWholesale()`, `wholesale` middleware). Stock changes only through `StockService` (row lock + ledger). Orders snapshot name/SKU/price. Staff permissions are checked per resource/action; cost prices and price edits need dedicated permissions.

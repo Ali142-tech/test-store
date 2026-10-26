@@ -72,15 +72,15 @@ Dashboard · Products(+variants, tiers, images) · Categories · Brands · Devic
 ## 7. Phase checklist
 
 - [x] **P1** Audit, architecture, schema design
-- [ ] **P2** Foundation: install, design system, layout, core migrations *(this milestone)*
-- [ ] **P3** Catalog: models, seeders, shop/category/brand/device/product pages, search & filters
-- [ ] **P4** Auth, accounts, wishlist, cart, coupons, checkout, order history
-- [ ] **P5** Wholesale: applications, tiers, MOQ, bulk cart, CSV, quotes
-- [ ] **P6** Filament admin, roles, inventory, suppliers, shipping, reports
-- [ ] **P7** Payments, emails, tracking
-- [ ] **P8** Promotions, bundles, SEO, safe caching
-- [ ] **P9** Test + harden
-- [ ] **P10** Deployment guide
+- [x] **P2** Foundation: install, design system, layout, core migrations
+- [x] **P3** Catalog: models, seeders, shop/category/brand/device/product pages, search & filters
+- [x] **P4** Auth, accounts, wishlist, cart, coupons, checkout, order history
+- [x] **P5** Wholesale: applications, tiers, MOQ, bulk cart, CSV, quotes
+- [x] **P6** Filament admin, roles, inventory, suppliers, shipping, reports
+- [x] **P7** Payments, emails, tracking
+- [x] **P8** Promotions, bundles, SEO, safe caching
+- [x] **P9** Test + harden
+- [x] **P10** Deployment guide
 
 ## 8. Business decisions needing owner input (defaults chosen)
 

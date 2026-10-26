@@ -14,7 +14,7 @@
             </div>
         </div>
         @if (! empty($hero?->image))
-            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($hero->image) }}" alt="{{ $hero->title }}" class="w-full rounded-[2rem] object-cover" fetchpriority="high">
+            <img src="{{ \Illuminate\Support\Facades\Storage::disk(config('store.media_disk'))->url($hero->image) }}" alt="{{ $hero->title }}" class="w-full rounded-[2rem] object-cover" fetchpriority="high">
         @else
         <div class="grid grid-cols-2 gap-4" aria-hidden="true">
             @foreach ($featured->take(4) as $p)

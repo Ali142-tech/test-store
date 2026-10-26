@@ -132,3 +132,10 @@ it('expires overdue quotes via the scheduled command', function () {
 it('registers the scheduled jobs', function () {
     $this->artisan('schedule:list')->assertSuccessful()->expectsOutputToContain('quotes:expire');
 });
+
+it('sanitises admin-authored page HTML at render time', function () {
+    \App\Models\Page::create(['title' => 'X', 'slug' => 'xss', 'body' => '<p onclick="steal()">Hi</p><script>alert(1)</script><a href="javascript:alert(2)">l</a><a href="https://ok.test">ok</a>']);
+    $html = $this->get('/pages/xss')->getContent();
+    expect($html)->toContain('<p>Hi</p>')->toContain('https://ok.test')
+        ->not->toContain('onclick')->not->toContain('<script>alert')->not->toContain('javascript:alert');
+});
