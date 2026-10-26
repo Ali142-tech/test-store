@@ -19,16 +19,16 @@
             <ul class="divide-y divide-line border-y border-line">
                 @foreach ($calc['lines'] as $l)
                     @php $v = $l['variant']; @endphp
-                    <li class="flex gap-4 py-5">
+                    <li class="flex flex-wrap gap-x-4 gap-y-2 py-5 sm:flex-nowrap">
                         <a href="{{ route('product', $v->product) }}" class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-mist ring-1 ring-line">@if ($img = $v->imageUrl())<img src="{{ $img }}" alt="{{ $v->product->name }}" class="h-full w-full object-contain" loading="lazy">@else<span class="text-2xl font-semibold text-accent/60">{{ mb_substr($v->product->name, 0, 1) }}</span>@endif</a>
-                        <div class="flex-1">
-                            <a href="{{ route('product', $v->product) }}" class="font-medium">{{ $v->product->name }}</a>
+                        <div class="min-w-0 flex-1">
+                            <a href="{{ route('product', $v->product) }}" class="break-words font-medium">{{ $v->product->name }}</a>
                             @if ($v->name)<p class="text-sm text-ink-soft">{{ $v->name }}</p>@endif
-                            <p class="text-sm text-ink-soft">SKU {{ $v->sku }}</p>
+                            <p class="break-all text-xs text-ink-soft">SKU {{ $v->sku }}</p>
                             <p class="mt-1 text-sm">{{ Money::format($l['unit_price']) }}
                                 @if ($l['price_source'] === 'tier' || $l['price_source'] === 'negotiated') <span class="ml-1 rounded-full bg-accent-soft px-2 py-0.5 text-xs text-accent">{{ $l['price_source'] === 'tier' ? 'Wholesale tier' : 'Negotiated' }}</span>@endif
                             </p>
-                            <div class="mt-3 flex items-center gap-4">
+                            <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
                                 <form method="post" action="{{ route('cart.update') }}" class="flex items-center gap-2">@csrf @method('PATCH')
                                     <input type="hidden" name="variant_id" value="{{ $v->id }}">
                                     <label class="sr-only" for="q{{ $v->id }}">Quantity</label>
@@ -38,7 +38,7 @@
                                 <form method="post" action="{{ route('cart.remove', $v->id) }}">@csrf @method('DELETE')<button class="text-sm text-ink-soft underline">Remove</button></form>
                             </div>
                         </div>
-                        <p class="font-semibold">{{ Money::format($l['line_total']) }}</p>
+                        <p class="shrink-0 font-semibold">{{ Money::format($l['line_total']) }}</p>
                     </li>
                 @endforeach
             </ul>

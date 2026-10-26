@@ -22,7 +22,7 @@
         <div class="mt-6 rounded-2xl border border-line p-5 text-sm">
             <p class="font-semibold">Complete your bank transfer</p>
             <p class="mt-1 text-ink-soft">Transfer {{ Money::format($order->grand_total) }} and use <strong>{{ $order->reference }}</strong> as the payment reference. We will confirm your order once the payment is verified.</p>
-            <dl class="mt-3 space-y-1">@foreach ($bank as $label => $value)<div class="flex gap-2"><dt class="text-ink-soft">{{ $label }}:</dt><dd>{{ $value }}</dd></div>@endforeach</dl>
+            <dl class="mt-3 space-y-1">@foreach ($bank as $label => $value)<div class="flex flex-wrap gap-x-2"><dt class="text-ink-soft">{{ $label }}:</dt><dd class="min-w-0 break-all">{{ $value }}</dd></div>@endforeach</dl>
         </div>
     @endif
 
@@ -36,10 +36,10 @@
         </tbody>
     </table>
 
-    <dl class="ml-auto mt-6 w-full max-w-xs space-y-1 text-sm">
+    <dl class="ml-auto mt-6 w-full min-w-0 max-w-xs space-y-1 text-sm">
         <div class="flex justify-between"><dt>Subtotal</dt><dd>{{ Money::format($order->subtotal) }}</dd></div>
         @if ((float) $order->discount_total > 0)<div class="flex justify-between"><dt>Discount</dt><dd>-{{ Money::format($order->discount_total) }}</dd></div>@endif
-        <div class="flex justify-between"><dt>Shipping ({{ $order->shipping_method_name }})</dt><dd>{{ Money::format($order->shipping_total) }}</dd></div>
+        <div class="flex justify-between gap-3"><dt class="min-w-0 break-words">Shipping ({{ $order->shipping_method_name }})</dt><dd class="shrink-0">{{ Money::format($order->shipping_total) }}</dd></div>
         @if ((float) $order->tax_total > 0)<div class="flex justify-between"><dt>Tax</dt><dd>{{ Money::format($order->tax_total) }}</dd></div>@endif
         <div class="flex justify-between border-t border-line pt-2 text-base font-semibold"><dt>Total</dt><dd>{{ Money::format($order->grand_total) }}</dd></div>
         @if ((float) $order->refunded_total > 0)<div class="flex justify-between text-ink-soft"><dt>Refunded</dt><dd>{{ Money::format($order->refunded_total) }}</dd></div>@endif

@@ -15,10 +15,10 @@
         </div>
     @endif
 
-    <form method="post" action="{{ $action }}" class="mt-8 grid gap-10 lg:grid-cols-[1fr_24rem]" @submit="submitting = true">
+    <form method="post" action="{{ $action }}" class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_24rem]" @submit="submitting = true">
         @csrf
         <input type="hidden" name="idempotency_key" value="{{ $idempotencyKey }}">
-        <div class="space-y-10">
+        <div class="min-w-0 space-y-10">
             <section>
                 <h2 class="text-lg font-semibold">1. Contact</h2>
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
@@ -76,7 +76,7 @@
                     @forelse ($methods as $code => $g)
                         <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4">
                             <input type="radio" name="payment_method" value="{{ $code }}" class="mt-1" @checked(old('payment_method', $loop->first ? $code : null) === $code) required>
-                            <span><span class="font-medium">{{ $g->label() }}</span><span class="block text-sm text-ink-soft">{{ $g->description() }}</span>@if ($code === 'bank_transfer')<span class="mt-2 block rounded-xl bg-mist p-3 text-sm"><span class="block font-medium">Pay into this account, then we confirm your order:</span>@foreach (\App\Services\Payments\BankTransferGateway::instructions() as $label => $value)<span class="block text-ink-soft">{{ $label }}: <span class="text-ink">{{ $value }}</span></span>@endforeach<span class="mt-1 block text-xs text-ink-soft">You will get your order reference after placing the order; use it as the payment reference. No card details are needed.</span></span>@endif</span>
+                            <span><span class="font-medium">{{ $g->label() }}</span><span class="block text-sm text-ink-soft">{{ $g->description() }}</span>@if ($code === 'bank_transfer')<span class="mt-2 block rounded-xl bg-mist p-3 text-sm"><span class="block font-medium">Pay into this account, then we confirm your order:</span>@foreach (\App\Services\Payments\BankTransferGateway::instructions() as $label => $value)<span class="block break-words text-ink-soft">{{ $label }}: <span class="break-all text-ink">{{ $value }}</span></span>@endforeach<span class="mt-1 block text-xs text-ink-soft">You will get your order reference after placing the order; use it as the payment reference. No card details are needed.</span></span>@endif</span>
                         </label>
                     @empty
                         <p class="text-sm text-danger">No payment methods are currently available. Please contact us.</p>
@@ -96,7 +96,7 @@
             <h2 class="font-semibold">6. Review order</h2>
             <ul class="mt-4 space-y-3 text-sm">
                 @foreach ($calc['lines'] as $l)
-                    <li class="flex items-center justify-between gap-3"><span class="flex items-center gap-3">@if ($img = $l['variant']->imageUrl())<img src="{{ $img }}" alt="" class="h-12 w-12 shrink-0 rounded-lg bg-white object-contain ring-1 ring-line">@endif<span>{{ $l['quantity'] }} × {{ $l['variant']->displayName() }}</span></span><span>{{ Money::format($l['line_total']) }}</span></li>
+                    <li class="flex items-center justify-between gap-3"><span class="flex items-center gap-3">@if ($img = $l['variant']->imageUrl())<img src="{{ $img }}" alt="" class="h-12 w-12 shrink-0 rounded-lg bg-white object-contain ring-1 ring-line">@endif<span class="min-w-0 break-words">{{ $l['quantity'] }} × {{ $l['variant']->displayName() }}</span></span><span>{{ Money::format($l['line_total']) }}</span></li>
                 @endforeach
             </ul>
             <template x-for="e in errors"><p class="mt-3 text-sm text-danger" x-text="e" role="alert"></p></template>

@@ -95,3 +95,21 @@ it('only lets active staff into the admin panel', function () {
     $staff->forceFill(['is_active' => false])->save();
     $this->actingAs($staff->fresh())->get('/admin')->assertForbidden();
 });
+
+it('gives phone users a sign-in icon, a drawer with account actions, and a search toggle', function () {
+    $html = $this->get('/')->getContent();
+    expect($html)->toContain('aria-label="Sign in"')              // visible icon on every screen size (not hidden on mobile)
+        ->and($html)->toContain('aria-label="Search"')            // phone search toggle
+        ->and($html)->toContain('Create account')                 // in the mobile drawer
+        ->and($html)->toContain('Wholesale accounts')
+        ->and($html)->not->toMatch('/<a href="[^"]*login"[^>]*class="hidden sm:inline-flex/'); // the old desktop-only link is gone
+});
+
+it('shows account links in the drawer for signed-in customers', function () {
+    $u = User::factory()->create();
+    $this->actingAs($u)->get('/')->assertSee('My orders')->assertSee('Sign out')->assertSee('Wishlist');
+});
+
+it('links to the admin login from the footer', function () {
+    $this->get('/')->assertSee(url('/admin/login'), false)->assertSee('Admin login');
+});

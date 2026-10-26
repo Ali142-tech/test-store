@@ -1,6 +1,6 @@
 @props(['name', 'label', 'type' => 'text', 'value' => null, 'required' => false, 'hint' => null])
 @php $key = str_replace(['[', ']'], ['.', ''], $name); $id = str_replace(['[', ']'], ['-', ''], $name); @endphp
-<div>
+<div class="min-w-0">
     <label for="{{ $id }}" class="text-sm font-medium">{{ $label }}@if ($required) <span class="text-danger" aria-hidden="true">*</span>@endif</label>
     <input id="{{ $id }}" name="{{ $name }}" type="{{ $type }}" value="{{ $type === 'password' ? '' : old($key, $value) }}" @required($required)
            {{ $attributes->merge(['class' => 'field mt-1.5']) }} @error($key) aria-invalid="true" @enderror>
