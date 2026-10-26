@@ -57,6 +57,11 @@ class ShopController extends Controller
         return $this->listing($request, Product::query()->where('published_at', '>=', now()->subDays(45)), 'New arrivals');
     }
 
+    public function bundles(Request $request)
+    {
+        return $this->listing($request, Product::query()->where('type', 'bundle'), 'Bundles & combo deals', 'Save more when you buy accessories together.');
+    }
+
     public function bestSellers(Request $request)
     {
         $request->merge(['sort' => $request->input('sort', 'popular')]);

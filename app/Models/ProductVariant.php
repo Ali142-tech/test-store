@@ -42,6 +42,15 @@ class ProductVariant extends Model
 
     public function available(): int
     {
+        $this->loadMissing('product');
+
+        // Bundles have no stock of their own: availability is the most complete sets their components allow.
+        if ($this->product->type === 'bundle') {
+            $items = BundleItem::where('bundle_product_id', $this->product_id)->with('variant')->get();
+
+            return $items->isEmpty() ? 0 : (int) $items->map(fn ($i) => intdiv($i->variant->available(), max(1, $i->quantity)))->min();
+        }
+
         return max(0, $this->stock_quantity - $this->reserved_quantity);
     }
 

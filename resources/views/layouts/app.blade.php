@@ -3,6 +3,7 @@
     use App\Models\StoreSetting;
     $storeName = StoreSetting::get('store_name', config('app.name'));
     $navCategories = Category::where('is_active', true)->whereNull('parent_id')->orderBy('sort_order')->limit(8)->get();
+    $cartCount = app(\App\Services\Cart\CartService::class)->count(auth()->user());
 @endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -12,6 +13,7 @@
     <title>{{ isset($metaTitle) ? $metaTitle.' | '.$storeName : $storeName.' - Mobile accessories, retail & wholesale' }}</title>
     <meta name="description" content="{{ $metaDescription ?? 'Phone cases, chargers, cables, power banks and more for every major phone brand. Retail and wholesale.' }}">
     <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
+    @if (request()->routeIs('cart.*', 'checkout.*', 'order.*', 'account.*', 'wholesale.*', 'quotes.*', 'login', 'register', 'search')) <meta name="robots" content="noindex,follow"> @endif
     <meta property="og:title" content="{{ $metaTitle ?? $storeName }}">
     <meta property="og:description" content="{{ $metaDescription ?? '' }}">
     <meta property="og:type" content="{{ $ogType ?? 'website' }}">
@@ -48,6 +50,21 @@
                 <input id="q" name="q" value="{{ request('q') }}" type="search" placeholder="Search products, SKU or phone model"
                        class="field !rounded-full !py-2.5 bg-mist border-transparent">
             </form>
+
+            <div class="flex items-center gap-1 text-sm font-medium">
+                @auth
+                    <a href="{{ route('account.wishlist') }}" class="hidden sm:inline-flex p-2" aria-label="Wishlist">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg></a>
+                    <a href="{{ route('account.dashboard') }}" class="p-2" aria-label="My account">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></a>
+                @else
+                    <a href="{{ route('login') }}" class="hidden sm:inline-flex px-3 py-2">Sign in</a>
+                @endauth
+                <a href="{{ route('cart.show') }}" class="relative p-2" aria-label="Cart ({{ $cartCount }} items)">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M5 7h14l-1.5 11h-11zM9 7a3 3 0 0 1 6 0"/></svg>
+                    @if ($cartCount > 0)<span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-[11px] font-semibold text-white">{{ $cartCount }}</span>@endif
+                </a>
+            </div>
         </div>
     </header>
 
@@ -72,9 +89,24 @@
     </div>
 
     <main id="main" class="flex-1">
-        {{ $slot ?? '' }}
+        @if (session('status'))
+            <div class="container-x pt-6"><p class="rounded-xl bg-accent-soft p-3 text-sm" role="status">{{ session('status') }}</p></div>
+        @endif
         @yield('content')
     </main>
+
+    <section class="border-t border-line bg-white">
+        <div class="container-x flex flex-col items-start justify-between gap-6 py-12 md:flex-row md:items-center">
+            <div><h2 class="text-xl font-semibold">Get offers and new arrivals</h2><p class="text-sm text-ink-soft">Marketing emails only with your consent. Unsubscribe anytime.</p></div>
+            <form action="{{ route('newsletter.store') }}" method="post" class="flex w-full max-w-md gap-2">
+                @csrf
+                <label class="sr-only" for="nl-email">Email</label>
+                <input id="nl-email" name="email" type="email" required placeholder="you@example.com" class="field">
+                <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <button class="btn btn-primary">Subscribe</button>
+            </form>
+        </div>
+    </section>
 
     <footer class="mt-20 border-t border-line bg-mist">
         <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4 text-sm">
@@ -95,6 +127,9 @@
                 <p class="font-semibold mb-3">Help</p>
                 <ul class="space-y-2 text-ink-soft">
                     <li><a href="{{ route('faqs') }}">FAQs</a></li>
+                    <li><a href="{{ route('contact') }}">Contact us</a></li>
+                    <li><a href="{{ route('order.track') }}">Track an order</a></li>
+                    <li><a href="{{ route('wholesale.register') }}">Wholesale accounts</a></li>
                     <li><a href="{{ route('page', 'shipping-policy') }}">Shipping policy</a></li>
                     <li><a href="{{ route('page', 'returns-and-refunds') }}">Returns & refunds</a></li>
                     <li><a href="{{ route('page', 'warranty-policy') }}">Warranty policy</a></li>

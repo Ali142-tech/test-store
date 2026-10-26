@@ -1,32 +1,8 @@
 <?php
 
-use App\Models\Product;
 use App\Models\User;
 use App\Models\WholesalePrice;
 use App\Services\Pricing\PriceResolver;
-
-function makeVariant(array $product = [], array $variant = []): App\Models\ProductVariant
-{
-    $p = Product::create(array_merge(['name' => 'Case', 'slug' => 'case-'.uniqid(), 'status' => 'active', 'wholesale_enabled' => true], $product));
-    $v = $p->variants()->create(array_merge(['sku' => 'SKU-'.uniqid(), 'price' => 1000, 'stock_quantity' => 500, 'wholesale_moq' => 10, 'is_default' => true], $variant));
-    foreach ([[10, 49, 900], [50, 99, 800], [100, null, 700]] as [$min, $max, $price]) {
-        $v->tiers()->create(['min_quantity' => $min, 'max_quantity' => $max, 'price' => $price]);
-    }
-
-    return $v->fresh();
-}
-
-function wholesaleUser(string $status = 'approved'): User
-{
-    $u = User::factory()->create();
-    $u->forceFill(['customer_type' => 'wholesale'])->save();
-    $u->wholesaleApplication()->create([
-        'business_name' => 'Shop', 'contact_name' => 'A', 'contact_phone' => '1', 'business_address' => 'x', 'city' => 'Lahore',
-    ]);
-    $u->wholesaleApplication->forceFill(['status' => $status])->save();
-
-    return $u->fresh();
-}
 
 it('charges retail price to guests and retail customers regardless of quantity', function () {
     $v = makeVariant();

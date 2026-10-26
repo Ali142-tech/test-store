@@ -72,7 +72,10 @@
         <p class="eyebrow !text-white/70">For shops & resellers</p>
         <h2 class="mt-3 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">Buying in bulk? Get tiered wholesale pricing.</h2>
         <p class="mt-4 max-w-xl text-white/70">Apply for a business account. Once approved you'll see quantity-based prices, can place bulk orders, and request custom quotes.</p>
-        <span class="btn mt-8 bg-white text-ink">Wholesale registration coming soon</span>
+        <div class="mt-8 flex flex-wrap gap-3">
+            <a href="{{ route('wholesale.register') }}" class="btn bg-white text-ink hover:bg-accent-soft">Apply for a wholesale account</a>
+            <a href="{{ route('contact') }}" class="btn border border-white/30 text-white">Talk to sales</a>
+        </div>
     </div>
 </section>
 
