@@ -33,10 +33,10 @@ class ContentSeeder extends Seeder
 
         $settings = [
             'store_name' => 'Voltix', 'currency' => 'PKR', 'currency_symbol' => 'Rs',
-            'announcement' => 'Free delivery over Rs 5,000 · Wholesale pricing available for shops',
-            'contact_email' => 'support@example.com', 'contact_phone' => '+92 000 0000000',
+            'announcement' => 'Prices in PKR · Retail and wholesale accounts available',
+            'contact_email' => '', 'contact_phone' => '', // set real contact details in Admin > Store settings
             'tax_rate' => '0', 'guest_checkout' => '1',
-            'wholesale_min_order_value' => '25000',
+            'wholesale_min_order_value' => '0',
         ];
         $settings += [
             'payment_cod_enabled' => '1', 'payment_cod_wholesale' => '0', 'payment_bank_enabled' => '1',

@@ -143,6 +143,7 @@ return new class extends Migration
             $table->foreignId('product_variant_id')->nullable()->constrained()->nullOnDelete();
             $table->string('path');
             $table->string('alt')->nullable();
+            $table->string('source_url', 500)->nullable(); // where the image/listing came from (attribution / takedown)
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
         });

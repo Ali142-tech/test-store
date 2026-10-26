@@ -10,7 +10,7 @@
             <h1 class="anim-up delay-1 mt-6 text-5xl font-bold leading-[1.02] tracking-tight sm:text-7xl">
                 {{ $hero->title ?? 'Power, sound & charging' }}<br><span class="text-gradient">for every phone.</span>
             </h1>
-            <p class="anim-up delay-2 mt-6 max-w-lg text-lg text-ink-soft">Chargers, cables, power banks, earbuds and more from Anker, Samsung, Baseus, Joyroom and other trusted names. Buy one, or buy in bulk for your shop.</p>
+            <p class="anim-up delay-2 mt-6 max-w-lg text-lg text-ink-soft">Chargers, cables, power banks, earbuds and more from {{ $brands->take(4)->pluck('name')->implode(', ') }} and more. Buy one, or buy in bulk for your shop.</p>
             <div class="anim-up delay-3 mt-9 flex flex-wrap gap-3">
                 <a href="{{ $hero->cta_url ?? route('shop') }}" class="btn btn-primary !px-8 !py-4 text-base">{{ $hero->cta_label ?? 'Shop now' }} →</a>
                 <a href="{{ route('wholesale.register') }}" class="btn btn-ghost !px-8 !py-4 text-base">Wholesale pricing</a>
@@ -18,7 +18,7 @@
             <dl class="anim-up delay-3 mt-12 grid max-w-md grid-cols-3 gap-6 border-t border-line pt-6">
                 <div><dt class="text-xs text-ink-soft">Products</dt><dd class="text-2xl font-bold">{{ $stats['products'] }}</dd></div>
                 <div><dt class="text-xs text-ink-soft">Brands</dt><dd class="text-2xl font-bold">{{ $stats['brands'] }}</dd></div>
-                <div><dt class="text-xs text-ink-soft">Bulk tiers from</dt><dd class="text-2xl font-bold">10 pcs</dd></div>
+                <div><dt class="text-xs text-ink-soft">Categories</dt><dd class="text-2xl font-bold">{{ $categories->count() }}</dd></div>
             </dl>
         </div>
 
@@ -26,7 +26,7 @@
             <img src="{{ \App\Models\ProductImage::urlFor($hero->image) }}" alt="{{ $hero->title }}" class="w-full rounded-[2rem] object-cover shadow-2xl" fetchpriority="high">
         @else
             <div class="relative mx-auto grid w-full max-w-xl grid-cols-2 gap-5">
-                @foreach ($featured->concat($newArrivals)->unique('id')->take(4) as $p)
+                @foreach ($heroProducts as $p)
                     <a href="{{ route('product', $p) }}" class="anim-float group block overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-black/5 {{ $loop->odd ? 'translate-y-8' : '' }}" style="--r: {{ $loop->odd ? '-2deg' : '2deg' }}; animation-delay: {{ $loop->index * .5 }}s">
                         <div class="aspect-square bg-mist">@if ($p->primaryImageUrl())<img src="{{ $p->primaryImageUrl() }}" alt="{{ $p->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" @if (! $loop->first) loading="lazy" @endif>@endif</div>
                         <div class="p-3"><p class="line-clamp-1 text-xs font-medium">{{ $p->name }}</p><p class="text-sm font-bold">{{ Money::format($p->defaultVariant?->currentRetailPrice()) }}</p></div>

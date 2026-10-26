@@ -29,6 +29,8 @@ class HomeController extends Controller
             'deviceBrands' => DeviceBrand::where('is_active', true)->with(['deviceModels' => fn ($q) => $q->where('is_active', true)->limit(4)])->orderBy('sort_order')->get(),
             'bestSellers' => $cards()->where(fn ($q) => $q->where('is_best_seller', true)->orWhere('sales_count', '>', 0))->orderByDesc('sales_count')->limit(8)->get(),
             'newArrivals' => $cards()->orderByDesc('published_at')->limit(8)->get(),
+            // Hero: one product from each of four different categories (with a real image).
+            'heroProducts' => $cards()->whereHas('images')->orderBy('id')->limit(400)->get()->unique('category_id')->take(4)->values(),
             'featured' => $cards()->where('is_featured', true)->limit(4)->get(),
             'deals' => $cards()->whereHas('variants', fn ($v) => $v->where('is_active', true)->whereNotNull('sale_price')->whereColumn('sale_price', '<', 'price'))->limit(4)->get(),
             'bundles' => $cards()->where('type', 'bundle')->limit(4)->get(),
@@ -36,8 +38,8 @@ class HomeController extends Controller
             'reviews' => Review::where('status', 'approved')->whereNotNull('body')->with('user:id,name', 'product:id,name,slug')->latest()->limit(3)->get(),
             'faqs' => Faq::where('is_active', true)->orderBy('sort_order')->get(),
             'trust' => array_filter([
-                'Delivery' => StoreSetting::get('trust_delivery', 'Delivery across Pakistan with tracking on every shipment.'),
                 'Payments' => 'Cash on delivery or bank transfer. We never store card details.',
+                'Delivery' => StoreSetting::get('trust_delivery'),
                 'Warranty' => StoreSetting::get('trust_warranty'),
                 'Returns' => 'Return requests are handled per our returns policy.',
             ]),
