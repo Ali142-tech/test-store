@@ -14,7 +14,7 @@ return new class extends Migration
         });
 
         Schema::table('quotes', function (Blueprint $table) {
-            $table->decimal('shipping_amount', 12, 2)->default(0)->after('quoted_total');
+            $table->decimal('shipping_amount', 12, 2)->nullable()->after('quoted_total'); // null = standard shipping rates
         });
 
         Schema::create('quote_events', function (Blueprint $table) {

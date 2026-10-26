@@ -10,6 +10,7 @@ class ProductController extends Controller
 {
     public function show(Request $request, Product $product, PriceResolver $prices)
     {
+        abort_if($product->status === 'archived', 410); // discontinued: tell crawlers it is gone
         abort_unless($product->status === 'active', 404);
 
         $product->load(['brand', 'category', 'images', 'variants' => fn ($q) => $q->where('is_active', true)->with('tiers'), 'deviceModels.deviceBrand'])

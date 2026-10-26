@@ -35,7 +35,7 @@ class CheckoutController extends Controller
 
         $default = $user?->addresses()->where('is_default_shipping', true)->first() ?? $user?->addresses()->first();
         $city = old('shipping.city', $default?->city);
-        $calc = $this->calculator->calculate($lines, $user, $coupon, $city, null, trusted: $quote !== null);
+        $calc = $this->calculator->calculate($lines, $user, $coupon, $city, null, trusted: $quote !== null, shippingOverride: $quote?->shipping_amount !== null ? (string) $quote->shipping_amount : null);
 
         return view('checkout.show', [
             'calc' => $calc, 'quote' => $quote, 'default' => $default,
@@ -51,7 +51,7 @@ class CheckoutController extends Controller
     {
         $data = $request->validate(['city' => 'nullable|string|max:100', 'shipping_method_id' => 'nullable|integer']);
         [$lines, $coupon] = $this->source($request, $quote);
-        $calc = $this->calculator->calculate($lines, $request->user(), $coupon, $data['city'] ?? null, $data['shipping_method_id'] ?? null, trusted: $quote !== null);
+        $calc = $this->calculator->calculate($lines, $request->user(), $coupon, $data['city'] ?? null, $data['shipping_method_id'] ?? null, trusted: $quote !== null, shippingOverride: $quote?->shipping_amount !== null ? (string) $quote->shipping_amount : null);
 
         return response()->json([
             'subtotal' => $calc['subtotal'], 'discount' => $calc['discount'], 'shipping' => $calc['shipping'], 'tax' => $calc['tax'], 'total' => $calc['total'],

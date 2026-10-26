@@ -24,7 +24,7 @@ class OrderCalculator
      * @param  array<int, array{variant_id:int, quantity:int, price?:string}>  $input  `price` is honoured only when $trusted (accepted quotes).
      * @return array{lines: array, subtotal: string, discount: string, shipping: string, tax: string, total: string, coupon: ?string, shipping_options: array, errors: array<int,string>, coupon_error: ?string, audience: string}
      */
-    public function calculate(array $input, ?User $user, ?string $couponCode = null, ?string $city = null, ?int $shippingMethodId = null, bool $trusted = false): array
+    public function calculate(array $input, ?User $user, ?string $couponCode = null, ?string $city = null, ?int $shippingMethodId = null, bool $trusted = false, ?string $shippingOverride = null): array
     {
         $audience = $user?->isApprovedWholesale() ? 'wholesale' : 'retail';
         $errors = [];
@@ -110,7 +110,8 @@ class OrderCalculator
             if (! $chosen) {
                 $errors[] = 'The selected shipping method is not available for your address.';
             } else {
-                $shippingCost = $chosen['cost'];
+                // A negotiated quote shipping amount replaces the computed rate.
+                $shippingCost = $trusted && $shippingOverride !== null ? bcadd($shippingOverride, '0', 2) : $chosen['cost'];
             }
         }
 

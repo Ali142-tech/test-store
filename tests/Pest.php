@@ -57,3 +57,11 @@ function checkoutPayload(array $overrides = []): array
         'payment_method' => 'cod', 'terms' => 1, 'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
     ], $overrides);
 }
+
+function staff(string $role): User
+{
+    $u = User::factory()->create();
+    $u->assignRole($role);
+
+    return $u->fresh();
+}

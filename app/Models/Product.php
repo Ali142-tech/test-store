@@ -28,6 +28,24 @@ class Product extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        // Keep old URLs alive: record a 301 whenever a published slug changes.
+        static::updating(function (self $p) {
+            if ($p->isDirty('slug') && $p->getOriginal('slug')) {
+                SlugRedirect::updateOrCreate(
+                    ['old_path' => '/product/'.$p->getOriginal('slug')],
+                    ['new_path' => '/product/'.$p->slug, 'status_code' => 301],
+                );
+            }
+        });
+    }
+
+    public function bundleItems(): HasMany
+    {
+        return $this->hasMany(BundleItem::class, 'bundle_product_id');
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';

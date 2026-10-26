@@ -54,6 +54,7 @@ class CheckoutService
                 $calc = $this->calculator->calculate(
                     $lines, $user, $data['coupon'] ?? null, $data['shipping_address']['city'] ?? null,
                     (int) $data['shipping_method_id'], trusted: $quote !== null,
+                    shippingOverride: $quote?->shipping_amount !== null ? (string) $quote->shipping_amount : null,
                 );
                 if ($calc['errors'] || $calc['coupon_error']) {
                     throw new CheckoutException(array_filter([...$calc['errors'], $calc['coupon_error']]));

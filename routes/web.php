@@ -120,3 +120,11 @@ Route::middleware(['auth', 'wholesale'])->prefix('wholesale')->group(function ()
     Route::get('/quotes/{quote}/summary', [CheckoutController::class, 'summary'])->name('quotes.summary');
     Route::post('/quotes/{quote}/checkout', [CheckoutController::class, 'place'])->middleware('throttle:10,1')->name('quotes.place');
 });
+
+// ---- Staff-only: private wholesale documents (never on the public disk) ----
+Route::middleware(['auth', 'can:manage wholesale'])->get('/admin/wholesale-applications/{application}/document', function (\App\Models\WholesaleApplication $application) {
+    abort_unless($application->document_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($application->document_path), 404);
+    \App\Services\Audit\AuditLogger::log('Wholesale.document_viewed', $application);
+
+    return \Illuminate\Support\Facades\Storage::disk('local')->download($application->document_path, $application->document_original_name ?: 'document');
+})->name('admin.wholesale-document');

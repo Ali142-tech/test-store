@@ -17,5 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', \App\Http\Middleware\SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Old product URLs (renamed slugs) redirect permanently to the new URL.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, \Illuminate\Http\Request $request) {
+            $r = \App\Models\SlugRedirect::where('old_path', '/'.$request->path())->first();
+
+            return $r ? redirect($r->new_path, $r->status_code) : null;
+        });
     })->create();
