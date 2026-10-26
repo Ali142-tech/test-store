@@ -56,11 +56,11 @@
     @endif
 
     <header class="glass sticky top-0 z-40 border-b border-line/70">
-        <div class="container-x flex h-16 items-center gap-4">
+        <div class="container-x flex h-16 items-center gap-1 sm:gap-4">
             <button class="lg:hidden -ml-2 p-2" @click="menu = true" aria-label="Open menu">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
             </button>
-            <a href="{{ route('home') }}" class="text-xl font-bold tracking-tight">{{ $storeName }}<span class="text-accent">.</span></a>
+            <a href="{{ route('home') }}" class="min-w-0 flex-1 truncate text-lg font-bold tracking-tight sm:text-xl md:flex-none" title="{{ $storeName }}">{{ $storeName }}<span class="text-accent">.</span></a>
 
             <nav class="ml-6 hidden lg:flex items-center gap-6 text-sm font-medium" aria-label="Main">
                 <a href="{{ route('shop') }}" class="hover:text-accent">Shop</a>
@@ -76,7 +76,7 @@
                        class="field !rounded-full !py-2.5 bg-mist border-transparent">
             </form>
 
-            <div class="ml-auto flex items-center gap-0.5 text-sm font-medium md:ml-0">
+            <div class="ml-auto flex shrink-0 items-center text-sm font-medium md:ml-0 sm:gap-0.5">
                 <button type="button" data-theme-toggle onclick="toggleTheme()" class="p-2" aria-label="Switch between light and dark theme" aria-pressed="false" title="Light / dark theme">
                     <svg class="h-6 w-6 dark:hidden" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
                     <svg class="hidden h-6 w-6 dark:block" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
@@ -111,7 +111,7 @@
         <div class="absolute inset-0 bg-black/40" @click="menu = false"></div>
         <aside class="absolute left-0 top-0 h-full w-80 max-w-[85%] bg-surface p-6 overflow-y-auto" x-transition>
             <div class="flex justify-between items-center mb-6">
-                <span class="text-lg font-bold">{{ $storeName }}</span>
+                <span class="min-w-0 break-words text-lg font-bold">{{ $storeName }}</span>
                 <button @click="menu = false" aria-label="Close menu" class="p-2">✕</button>
             </div>
             <div class="mb-4 grid gap-2 rounded-2xl bg-mist p-4 text-sm">
@@ -165,7 +165,7 @@
     <footer class="bg-deep text-white">
         <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4 text-sm">
             <div>
-                <p class="text-lg font-bold">{{ $storeName }}<span class="text-accent">.</span></p>
+                <p class="break-words text-lg font-bold">{{ $storeName }}<span class="text-accent">.</span></p>
                 <p class="mt-3 text-white/60">Accessories for every major phone brand. Retail and wholesale.</p>
             </div>
             <div>

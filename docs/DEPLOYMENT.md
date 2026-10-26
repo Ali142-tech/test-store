@@ -12,7 +12,9 @@ Nothing here is run automatically. **Never run migrations, seeders or restores o
 sudo mkdir -p /var/www/store && sudo chown $USER /var/www/store && cd /var/www/store
 git clone <your-repo> releases/1 && ln -sfn releases/1 current && cd current
 composer install --no-dev --optimize-autoloader
-npm ci && npm run build            # can be done on CI instead
+# The built front end (public/build) is COMMITTED to git, so the server needs no Node.
+# After changing any CSS/JS/Blade classes, run `npm run build` locally and commit public/build before pushing.
+# (If you build on the server instead: `npm ci && npm run build`.) A stale public/build breaks the layout, side menu and dark theme.
 cp .env.production.example .env    # fill in real values; APP_DEBUG=false
 php artisan key:generate --force   # ONLY the first time. Changing APP_KEY later invalidates sessions and encrypted data.
 ```

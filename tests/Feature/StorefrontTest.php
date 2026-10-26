@@ -124,3 +124,24 @@ it('ships a light/dark theme: pre-paint script, toggle button, dark tokens in th
     $css = collect(glob(public_path('build/assets/*.css')))->map(fn ($f) => file_get_contents($f))->implode('');
     expect($css)->toContain(':root.dark')->toContain('--color-surface');
 });
+
+it('has an up-to-date built front end that is safe to commit and deploy', function () {
+    $manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true);
+    $css = file_get_contents(public_path('build/'.$manifest['resources/css/app.css']['file']));
+    expect(file_exists(public_path('build/'.$manifest['resources/js/app.js']['file'])))->toBeTrue();
+
+    // Every theme/layout class the templates rely on must exist in the committed CSS (catches a stale build).
+    foreach (['.bg-surface', '.bg-deep', '.photo-bg', ':root.dark', '.min-w-0', '.break-all', '.glass', '.truncate', '.shrink-0'] as $needle) {
+        expect($css)->toContain($needle);
+    }
+});
+
+it('keeps the header usable with a very long store name (logo truncates, icons never pushed off-screen)', function () {
+    \App\Models\StoreSetting::updateOrCreate(['key' => 'store_name'], ['value' => 'PakistanMobileAccessoriesWholesaleStore']);
+    \Illuminate\Support\Facades\Cache::flush();
+    $html = $this->get('/')->getContent();
+
+    expect($html)->toContain('PakistanMobileAccessoriesWholesaleStore')
+        ->and($html)->toMatch('/<a href="[^"]*" class="min-w-0 flex-1 truncate[^"]*"/')   // logo can shrink and ellipsis
+        ->and($html)->toContain('ml-auto flex shrink-0');                                  // icon group never shrinks away
+});
