@@ -96,7 +96,7 @@ it('offers the review form on the product page only to customers who received th
     $this->actingAs($u)->post("/account/reviews/{$v->product->slug}", ['rating' => 4, 'title' => 'Solid', 'body' => 'Works well'])->assertSessionHasNoErrors();
 
     $this->actingAs($u)->get($url)->assertSee('awaiting approval')->assertSee('Update your review');
-    $this->get($url)->assertDontSee('Works well'); // pending reviews are invisible to everyone else
+    expect($this->get($url)->viewData('reviews'))->toBeEmpty(); // pending reviews are not in the public list
     \App\Models\Review::first()->forceFill(['status' => 'approved'])->save();
     $this->get($url)->assertSee('Works well')->assertSee('Verified purchase');
 });

@@ -116,7 +116,7 @@ it('lets only delivered-order customers review a product, and holds reviews for 
     $this->actingAs($u)->post("/account/reviews/{$v->product->slug}", ['rating' => 5, 'body' => 'great'])->assertSessionHasNoErrors();
     $review = \App\Models\Review::first();
     expect($review->status)->toBe('pending')->and($review->is_verified_purchase)->toEqual(true);
-    $this->get(route('product', $v->product))->assertDontSee('great'); // not shown until approved
+    expect($this->get(route('product', $v->product))->viewData('reviews'))->toBeEmpty(); // not shown until approved
     $review->forceFill(['status' => 'approved'])->save();
     $this->get(route('product', $v->product))->assertSee('great')->assertSee('Verified purchase');
 });
