@@ -10,6 +10,12 @@ class Category extends Model
 {
     protected $guarded = ['id'];
 
+    protected static function booted(): void
+    {
+        static::saved(fn () => \Illuminate\Support\Facades\Cache::forget('nav.categories'));
+        static::deleted(fn () => \Illuminate\Support\Facades\Cache::forget('nav.categories'));
+    }
+
     protected function casts(): array
     {
         return ['is_active' => 'boolean'];

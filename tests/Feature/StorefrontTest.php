@@ -25,13 +25,13 @@ it('renders category, brand, device and product pages', function () {
     $this->get(route('product', $p))->assertOk()->assertSee($p->name);
 });
 
-it('returns 404 for unknown, draft and archived products', function () {
+it('returns 404 for unknown and draft products, and 410 Gone for archived ones', function () {
     $this->get('/product/nope')->assertNotFound();
     $p = Product::active()->first();
     $p->update(['status' => 'draft']);
     $this->get(route('product', $p))->assertNotFound();
     $p->update(['status' => 'archived']);
-    $this->get(route('product', $p))->assertNotFound();
+    $this->get(route('product', $p))->assertStatus(410);
 });
 
 it('hides draft products from listings and search', function () {

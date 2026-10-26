@@ -142,7 +142,10 @@ class ShopController extends Controller
             default => $query->orderByDesc('is_featured')->orderByDesc('sales_count'),
         };
 
+        $page = $request->integer('page', 1);
+
         return view('shop.index', [
+            'canonical' => $page > 1 ? url()->current().'?page='.$page : url()->current(),
             'title' => $title,
             'intro' => $intro,
             'products' => $query->paginate(12)->withQueryString(),

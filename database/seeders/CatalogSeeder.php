@@ -95,5 +95,18 @@ class CatalogSeeder extends Seeder
                 $product->deviceModels()->syncWithoutDetaching($models->random(min(5, $models->count()))->pluck('id'));
             }
         }
+
+        // Demo bundle: stock derives from its components.
+        $bundle = Product::firstOrCreate(['slug' => 'protect-and-charge-bundle'], [
+            'name' => 'Protect & Charge Bundle', 'type' => 'bundle', 'category_id' => $cats['Bundles & Packs']->id, 'brand_id' => $brands['Voltix Essentials']->id,
+            'short_description' => 'Case, tempered glass and a 20W charger in one pack.', 'status' => 'active', 'published_at' => now(),
+        ]);
+        $parts = \App\Models\ProductVariant::whereIn('sku', ['ARMOR-SHIELD-CASE-BLACK', 'TEMPERED-GLASS-9H-SINGLE', '20W-USB-C-CHARGER-20W'])->get();
+        if ($bundle->variants()->count() === 0 && $parts->count() === 3) {
+            $bundle->variants()->create(['sku' => 'BUNDLE-PROTECT-CHARGE', 'price' => round($parts->sum('price') * 0.9), 'is_default' => true]);
+            foreach ($parts as $p) {
+                \App\Models\BundleItem::create(['bundle_product_id' => $bundle->id, 'product_variant_id' => $p->id, 'quantity' => 1]);
+            }
+        }
     }
 }

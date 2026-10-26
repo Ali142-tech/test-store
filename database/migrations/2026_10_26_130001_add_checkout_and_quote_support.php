@@ -31,6 +31,13 @@ return new class extends Migration
             $table->string('document_original_name')->nullable()->after('document_path');
         });
 
+        Schema::table('carts', function (Blueprint $table) {
+            $table->timestamp('reminded_at')->nullable();
+        });
+        Schema::table('orders', function (Blueprint $table) {
+            $table->timestamp('review_requested_at')->nullable();
+        });
+
         Schema::table('products', function (Blueprint $table) {
             $table->index('published_at');
         });

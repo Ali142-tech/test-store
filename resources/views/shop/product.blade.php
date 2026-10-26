@@ -24,17 +24,32 @@
 </script>
 @endpush
 
+@push('head')
+<script>
+function productPage(variants, symbol) {
+    return {
+        variants, selected: 0, qty: 1,
+        get v() { return this.variants[this.selected]; },
+        get minQty() { return this.v ? this.v.moq : 1; },
+        init() { this.qty = this.minQty; },
+        pick(i) { this.selected = i; this.qty = Math.min(Math.max(this.qty, this.minQty), Math.max(this.v.available, 1)); },
+        money(n) { return symbol + ' ' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); },
+    };
+}
+</script>
+@endpush
+@push('head')
+<script type="application/ld+json">
+{!! json_encode(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => array_values(array_filter([
+    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => route('home')],
+    $product->category ? ['@type' => 'ListItem', 'position' => 2, 'name' => $product->category->name, 'item' => route('category', $product->category)] : null,
+    ['@type' => 'ListItem', 'position' => $product->category ? 3 : 2, 'name' => $product->name, 'item' => url()->current()],
+]))], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
+</script>
+@endpush
+
 @section('content')
-<div class="container-x py-10" x-data='{
-    variants: @js($variants),
-    selected: 0,
-    qty: 1,
-    get v() { return this.variants[this.selected] },
-    get minQty() { return this.v ? this.v.moq : 1 },
-    init() { this.qty = this.minQty },
-    pick(i) { this.selected = i; this.qty = Math.max(this.qty, this.minQty); this.qty = Math.min(this.qty, Math.max(this.v.available, 1)) },
-    money(n) { return "{{ \App\Models\StoreSetting::get("currency_symbol", "Rs") }} " + Number(n).toLocaleString("en-US", {maximumFractionDigits: 0}) }
-}'>
+<div class="container-x py-10" x-data="productPage(@js($variants), @js(\App\Models\StoreSetting::get('currency_symbol', 'Rs')))">
     <nav class="text-xs text-ink-soft" aria-label="Breadcrumb">
         <a href="{{ route('home') }}">Home</a>
         @if ($product->category) / <a href="{{ route('category', $product->category) }}">{{ $product->category->name }}</a> @endif
@@ -162,6 +177,13 @@
             <p class="mt-3 text-sm text-ink-soft">No reviews yet.</p>
         @endforelse
     </section>
+
+    @if ($recent->isNotEmpty())
+        <section class="mt-14">
+            <h2 class="text-xl font-semibold">Recently viewed</h2>
+            <div class="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4">@foreach ($recent->take(4) as $p) <x-product-card :product="$p" /> @endforeach</div>
+        </section>
+    @endif
 
     @if ($related->isNotEmpty())
         <section class="mt-14">

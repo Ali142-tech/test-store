@@ -36,7 +36,13 @@ class ProductController extends Controller
         $related = Product::active()->where('category_id', $product->category_id)->whereKeyNot($product->id)
             ->with(['defaultVariant', 'images', 'brand'])->withAvg('reviews', 'rating')->withCount('reviews')->limit(4)->get();
 
+        // Recently viewed (per-session ids only; no personal data stored).
+        $seen = collect(session('recently_viewed', []))->reject(fn ($id) => $id === $product->id)->prepend($product->id)->take(9)->values();
+        session(['recently_viewed' => $seen->all()]);
+        $recent = Product::active()->whereIn('id', $seen->slice(1))->with(['defaultVariant', 'images', 'brand'])->get()->sortBy(fn ($p) => $seen->search($p->id))->values();
+
         return view('shop.product', [
+            'recent' => $recent,
             'product' => $product,
             'variants' => $variants,
             'related' => $related,

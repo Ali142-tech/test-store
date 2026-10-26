@@ -2,7 +2,7 @@
     use App\Models\Category;
     use App\Models\StoreSetting;
     $storeName = StoreSetting::get('store_name', config('app.name'));
-    $navCategories = Category::where('is_active', true)->whereNull('parent_id')->orderBy('sort_order')->limit(8)->get();
+    $navCategories = \Illuminate\Support\Facades\Cache::remember('nav.categories', 600, fn () => Category::where('is_active', true)->whereNull('parent_id')->orderBy('sort_order')->limit(8)->get());
     $cartCount = app(\App\Services\Cart\CartService::class)->count(auth()->user());
 @endphp
 <!doctype html>

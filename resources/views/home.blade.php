@@ -13,11 +13,15 @@
                 <a href="{{ route('deals') }}" class="btn btn-ghost">View deals</a>
             </div>
         </div>
+        @if (! empty($hero?->image))
+            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($hero->image) }}" alt="{{ $hero->title }}" class="w-full rounded-[2rem] object-cover" fetchpriority="high">
+        @else
         <div class="grid grid-cols-2 gap-4" aria-hidden="true">
             @foreach ($featured->take(4) as $p)
                 <div class="aspect-square rounded-[var(--radius-card)] bg-white shadow-sm border border-line flex items-center justify-center p-4 text-center text-sm font-medium {{ $loop->odd ? 'translate-y-6' : '' }}">{{ $p->name }}</div>
             @endforeach
         </div>
+        @endif
     </div>
 </section>
 
@@ -52,7 +56,7 @@
     </div>
 </section>
 
-@foreach ([['Best sellers', $bestSellers, 'best-sellers'], ['New arrivals', $newArrivals, 'new-arrivals'], ['Deals', $deals, 'deals']] as [$label, $list, $route])
+@foreach ([['Best sellers', $bestSellers, 'best-sellers'], ['New arrivals', $newArrivals, 'new-arrivals'], ['Featured collection', $featured, 'shop'], ['Deals', $deals, 'deals'], ['Bundles & combo deals', $bundles, 'bundles']] as [$label, $list, $route])
     @if ($list->isNotEmpty())
     <section class="section container-x">
         <div class="flex items-end justify-between">
@@ -78,6 +82,31 @@
         </div>
     </div>
 </section>
+
+{{-- Trust: only statements backed by real store settings/policies --}}
+<section class="section container-x">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        @foreach ($trust as $title => $text)
+            <div class="rounded-2xl border border-line p-6"><p class="font-semibold">{{ $title }}</p><p class="mt-2 text-sm text-ink-soft">{{ $text }}</p></div>
+        @endforeach
+    </div>
+</section>
+
+{{-- Genuine reviews only: section is omitted until real approved reviews exist --}}
+@if ($reviews->isNotEmpty())
+<section class="bg-mist section">
+    <div class="container-x">
+        <h2 class="h-section">What customers say</h2>
+        <div class="mt-8 grid gap-4 md:grid-cols-3">
+            @foreach ($reviews as $r)
+                <figure class="rounded-2xl bg-white p-6"><p class="text-amber-500">{{ str_repeat('★', $r->rating) }}</p>
+                    <blockquote class="mt-2 text-sm">{{ $r->body }}</blockquote>
+                    <figcaption class="mt-3 text-xs text-ink-soft">{{ $r->user->name }} on <a class="underline" href="{{ route('product', $r->product) }}">{{ $r->product->name }}</a>@if ($r->is_verified_purchase) · Verified purchase @endif</figcaption></figure>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- FAQ --}}
 @if ($faqs->isNotEmpty())
