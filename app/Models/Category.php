@@ -16,6 +16,17 @@ class Category extends Model
         static::deleted(fn () => \Illuminate\Support\Facades\Cache::forget('nav.categories'));
     }
 
+    /** Categories that have at least one active product (empty categories are hidden from the storefront). */
+    public function scopeVisible(\Illuminate\Database\Eloquent\Builder $q): \Illuminate\Database\Eloquent\Builder
+    {
+        return $q->where('is_active', true)->whereHas('products', fn ($p) => $p->where('status', 'active'));
+    }
+
+    public function coverUrl(): ?string
+    {
+        return $this->products()->where('status', 'active')->whereHas('images')->with('images')->first()?->primaryImageUrl();
+    }
+
     protected function casts(): array
     {
         return ['is_active' => 'boolean'];

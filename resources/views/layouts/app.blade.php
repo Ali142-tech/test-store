@@ -2,7 +2,7 @@
     use App\Models\Category;
     use App\Models\StoreSetting;
     $storeName = StoreSetting::get('store_name', config('app.name'));
-    $navCategories = \Illuminate\Support\Facades\Cache::remember('nav.categories', 600, fn () => Category::where('is_active', true)->whereNull('parent_id')->orderBy('sort_order')->limit(8)->get());
+    $navCategories = \Illuminate\Support\Facades\Cache::remember('nav.categories', 600, fn () => Category::visible()->whereNull('parent_id')->orderBy('sort_order')->limit(8)->get());
     $cartCount = app(\App\Services\Cart\CartService::class)->count(auth()->user());
 @endphp
 <!doctype html>
@@ -27,10 +27,10 @@
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3">Skip to content</a>
 
     @if ($announcement = StoreSetting::get('announcement'))
-        <div class="bg-ink text-center text-xs sm:text-sm text-white py-2 px-4">{{ $announcement }}</div>
+        <div class="bg-gradient-to-r from-ink via-[#241a52] to-ink text-center text-xs sm:text-sm text-white py-2.5 px-4 tracking-wide">{{ $announcement }}</div>
     @endif
 
-    <header class="sticky top-0 z-40 border-b border-line bg-white/90 backdrop-blur">
+    <header class="glass sticky top-0 z-40 border-b border-line/70">
         <div class="container-x flex h-16 items-center gap-4">
             <button class="lg:hidden -ml-2 p-2" @click="menu = true" aria-label="Open menu">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -95,7 +95,7 @@
         @yield('content')
     </main>
 
-    <section class="border-t border-line bg-white">
+    <section class="mt-16 border-t border-line bg-mist">
         <div class="container-x flex flex-col items-start justify-between gap-6 py-12 md:flex-row md:items-center">
             <div><h2 class="text-xl font-semibold">Get offers and new arrivals</h2><p class="text-sm text-ink-soft">Marketing emails only with your consent. Unsubscribe anytime.</p></div>
             <form action="{{ route('newsletter.store') }}" method="post" class="flex w-full max-w-md gap-2">
@@ -108,15 +108,15 @@
         </div>
     </section>
 
-    <footer class="mt-20 border-t border-line bg-mist">
+    <footer class="bg-ink text-white">
         <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4 text-sm">
             <div>
                 <p class="text-lg font-bold">{{ $storeName }}<span class="text-accent">.</span></p>
-                <p class="mt-3 text-ink-soft">Accessories for every major phone brand. Retail and wholesale.</p>
+                <p class="mt-3 text-white/60">Accessories for every major phone brand. Retail and wholesale.</p>
             </div>
             <div>
                 <p class="font-semibold mb-3">Shop</p>
-                <ul class="space-y-2 text-ink-soft">
+                <ul class="space-y-2 text-white/60 [&_a:hover]:text-white">
                     <li><a href="{{ route('shop') }}">All products</a></li>
                     <li><a href="{{ route('new-arrivals') }}">New arrivals</a></li>
                     <li><a href="{{ route('best-sellers') }}">Best sellers</a></li>
@@ -125,7 +125,7 @@
             </div>
             <div>
                 <p class="font-semibold mb-3">Help</p>
-                <ul class="space-y-2 text-ink-soft">
+                <ul class="space-y-2 text-white/60 [&_a:hover]:text-white">
                     <li><a href="{{ route('faqs') }}">FAQs</a></li>
                     <li><a href="{{ route('contact') }}">Contact us</a></li>
                     <li><a href="{{ route('order.track') }}">Track an order</a></li>
@@ -137,7 +137,7 @@
             </div>
             <div>
                 <p class="font-semibold mb-3">Company</p>
-                <ul class="space-y-2 text-ink-soft">
+                <ul class="space-y-2 text-white/60 [&_a:hover]:text-white">
                     <li><a href="{{ route('page', 'about') }}">About us</a></li>
                     <li><a href="{{ route('page', 'privacy-policy') }}">Privacy policy</a></li>
                     <li><a href="{{ route('page', 'terms-and-conditions') }}">Terms & conditions</a></li>
@@ -145,7 +145,7 @@
                 </ul>
             </div>
         </div>
-        <div class="border-t border-line py-5 text-center text-xs text-ink-soft">© {{ date('Y') }} {{ $storeName }}. All rights reserved.</div>
+        <div class="border-t border-white/10 py-5 text-center text-xs text-white/50">© {{ date('Y') }} {{ $storeName }}. All rights reserved.</div>
     </footer>
 </body>
 </html>

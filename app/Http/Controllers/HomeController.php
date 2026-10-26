@@ -23,9 +23,11 @@ class HomeController extends Controller
                 ->where(fn ($q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', now()))
                 ->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>=', now()))->orderBy('sort_order')->first(),
             'promo' => Banner::where('placement', 'promo')->where('is_active', true)->orderBy('sort_order')->limit(2)->get(),
-            'categories' => Category::where('is_active', true)->whereNull('parent_id')->orderBy('sort_order')->get(),
+            'categories' => Category::visible()->withCount(['products as active_count' => fn ($q) => $q->where('status', 'active')])->whereNull('parent_id')->orderBy('sort_order')->get(),
+            'brands' => \App\Models\Brand::where('is_active', true)->whereHas('products', fn ($q) => $q->where('status', 'active'))->withCount('products')->orderByDesc('products_count')->limit(14)->get(),
+            'stats' => ['products' => Product::active()->count(), 'brands' => \App\Models\Brand::whereHas('products', fn ($q) => $q->where('status', 'active'))->count()],
             'deviceBrands' => DeviceBrand::where('is_active', true)->with(['deviceModels' => fn ($q) => $q->where('is_active', true)->limit(4)])->orderBy('sort_order')->get(),
-            'bestSellers' => $cards()->orderByDesc('sales_count')->limit(8)->get(),
+            'bestSellers' => $cards()->where(fn ($q) => $q->where('is_best_seller', true)->orWhere('sales_count', '>', 0))->orderByDesc('sales_count')->limit(8)->get(),
             'newArrivals' => $cards()->orderByDesc('published_at')->limit(8)->get(),
             'featured' => $cards()->where('is_featured', true)->limit(4)->get(),
             'deals' => $cards()->whereHas('variants', fn ($v) => $v->where('is_active', true)->whereNotNull('sale_price')->whereColumn('sale_price', '<', 'price'))->limit(4)->get(),

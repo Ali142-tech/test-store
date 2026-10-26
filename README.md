@@ -31,3 +31,6 @@ composer audit && npm audit
 
 ## Key rules enforced on the server
 Prices, discounts, shipping, tax and totals are always recomputed server-side (`OrderCalculator`, `PriceResolver`). Wholesale pricing/MOQ/quotes require an *approved* application (`User::isApprovedWholesale()`, `wholesale` middleware). Stock changes only through `StockService` (row lock + ledger). Orders snapshot name/SKU/price. Staff permissions are checked per resource/action; cost prices and price edits need dedicated permissions.
+
+## Catalogue seeding (real data)
+`RealCatalogSeeder` (run by `php artisan migrate:fresh --seed` outside production) creates ~68 real products with PKR prices taken from PriceOye (Oct 2026): Anker power banks/chargers, Samsung adapters, cables, earbuds, wireless and car chargers. **Prices change: verify before selling.** Cases, screen protectors, lens protectors, stands and watch bands are not seeded (no verified Pakistani prices found). Opening stock (40) and wholesale tiers (5/10/15% at 10/50/100) are placeholders. Product images are generated illustrations, not photos: upload licensed photos in Admin > Products > Images. No sale prices, ratings, sales counts or warranty claims are invented.

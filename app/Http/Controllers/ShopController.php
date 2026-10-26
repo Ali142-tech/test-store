@@ -150,7 +150,7 @@ class ShopController extends Controller
             'intro' => $intro,
             'products' => $query->paginate(12)->withQueryString(),
             'filters' => $data,
-            'categories' => Category::where('is_active', true)->whereNull('parent_id')->orderBy('sort_order')->get(),
+            'categories' => Category::visible()->whereNull('parent_id')->orderBy('sort_order')->get(),
             'brands' => Brand::where('is_active', true)->orderBy('name')->get(),
             'colors' => \App\Models\ProductVariant::whereNotNull('color')->distinct()->orderBy('color')->pluck('color'),
         ]);

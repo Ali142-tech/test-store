@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
 
         // Demo data and a known-password admin only outside production.
         if (! app()->isProduction()) {
-            $this->call(CatalogSeeder::class);
+            $this->call(RealCatalogSeeder::class);
 
             $admin = User::firstOrCreate(['email' => 'admin@voltix.test'], [
                 'name' => 'Demo Admin', 'password' => 'password',

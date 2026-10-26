@@ -10,7 +10,7 @@ use App\Models\Product;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-/** DEMO DATA ONLY. Brands are fictional so no authenticity claims are implied. */
+/** TEST FIXTURE ONLY (fictional brands). The app seeds RealCatalogSeeder. */
 class CatalogSeeder extends Seeder
 {
     public function run(): void
