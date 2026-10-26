@@ -52,6 +52,9 @@ class ProductController extends Controller
 
         return view('shop.product', [
             'recent' => $recent,
+            // A review form is offered only to signed-in customers who have received this product.
+            'canReview' => $user && \App\Models\OrderItem::where('product_id', $product->id)->whereHas('order', fn ($q) => $q->where('user_id', $user->id)->where('status', 'delivered'))->exists(),
+            'myReview' => $user ? \App\Models\Review::where('product_id', $product->id)->where('user_id', $user->id)->first() : null,
             'product' => $product,
             'variants' => $variants,
             'related' => $related,

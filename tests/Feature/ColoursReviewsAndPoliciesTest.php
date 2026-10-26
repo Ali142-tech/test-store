@@ -75,3 +75,28 @@ it('falls back to the contact page when no contact email is configured, and keep
     $this->seed(PolicyPagesSeeder::class);
     expect(Page::where('slug', 'about')->value('body'))->toBe('<p>Custom about text</p>');
 });
+
+it('offers the review form on the product page only to customers who received the product', function () {
+    seedShipping();
+    $v = makeVariant(['wholesale_enabled' => false]);
+    $url = route('product', $v->product);
+
+    $this->get($url)->assertSee('Only customers who have received this product can review it')->assertDontSee('Submit review');
+
+    $u = \App\Models\User::factory()->create();
+    $this->actingAs($u)->post('/cart/add', ['variant_id' => $v->id, 'quantity' => 1]);
+    $this->actingAs($u)->post('/checkout', checkoutPayload());
+    $this->actingAs($u)->get($url)->assertDontSee('Submit review'); // ordered, not delivered yet
+
+    $order = \App\Models\Order::first();
+    foreach (['confirmed', 'processing', 'shipped', 'delivered'] as $s) {
+        app(\App\Services\Orders\OrderService::class)->transition($order->fresh(), $s);
+    }
+    $this->actingAs($u)->get($url)->assertSee('Write a review')->assertSee('Submit review');
+    $this->actingAs($u)->post("/account/reviews/{$v->product->slug}", ['rating' => 4, 'title' => 'Solid', 'body' => 'Works well'])->assertSessionHasNoErrors();
+
+    $this->actingAs($u)->get($url)->assertSee('awaiting approval')->assertSee('Update your review');
+    $this->get($url)->assertDontSee('Works well'); // pending reviews are invisible to everyone else
+    \App\Models\Review::first()->forceFill(['status' => 'approved'])->save();
+    $this->get($url)->assertSee('Works well')->assertSee('Verified purchase');
+});
