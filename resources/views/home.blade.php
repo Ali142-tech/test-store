@@ -27,8 +27,8 @@
         @else
             <div class="relative mx-auto grid w-full max-w-xl grid-cols-2 gap-5">
                 @foreach ($heroProducts as $p)
-                    <a href="{{ route('product', $p) }}" class="anim-float group block overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-black/5 {{ $loop->odd ? 'translate-y-8' : '' }}" style="--r: {{ $loop->odd ? '-2deg' : '2deg' }}; animation-delay: {{ $loop->index * .5 }}s">
-                        <div class="aspect-square bg-mist">@if ($p->primaryImageUrl())<img src="{{ $p->primaryImageUrl() }}" alt="{{ $p->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" @if (! $loop->first) loading="lazy" @endif>@endif</div>
+                    <a href="{{ route('product', $p) }}" class="anim-float group block overflow-hidden rounded-3xl bg-surface shadow-xl ring-1 ring-black/5 {{ $loop->odd ? 'translate-y-8' : '' }}" style="--r: {{ $loop->odd ? '-2deg' : '2deg' }}; animation-delay: {{ $loop->index * .5 }}s">
+                        <div class="photo-bg aspect-square">@if ($p->primaryImageUrl())<img src="{{ $p->primaryImageUrl() }}" alt="{{ $p->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" @if (! $loop->first) loading="lazy" @endif>@endif</div>
                         <div class="p-3"><p class="line-clamp-1 text-xs font-medium">{{ $p->name }}</p><p class="text-sm font-bold">{{ Money::format($p->defaultVariant?->currentRetailPrice()) }}</p></div>
                     </a>
                 @endforeach
@@ -39,7 +39,7 @@
 
 {{-- ============ Brand strip ============ --}}
 @if ($brands->isNotEmpty())
-<section class="marquee overflow-hidden border-y border-line bg-white py-5" aria-label="Brands">
+<section class="marquee overflow-hidden border-y border-line bg-surface py-5" aria-label="Brands">
     <div class="marquee-track gap-10 text-lg font-semibold text-ink-soft/70">
         @foreach ([1, 2] as $_)
             @foreach ($brands as $b)<a href="{{ route('brand', $b) }}" class="mx-6 whitespace-nowrap hover:text-ink">{{ $b->name }}</a>@endforeach
@@ -56,7 +56,7 @@
             @php $cover = $c->coverUrl(); @endphp
             <a href="{{ route('category', $c) }}" class="card-lift group relative block overflow-hidden rounded-3xl bg-mist ring-1 ring-line">
                 <div class="aspect-[4/5]">@if ($cover)<img src="{{ $cover }}" alt="" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">@endif</div>
-                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink via-ink/85 to-transparent p-4 pt-16 text-white"><p class="font-semibold leading-tight">{{ $c->name }}</p><p class="text-xs text-white/70">{{ $c->active_count }} products</p></div>
+                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-deep via-deep/85 to-transparent p-4 pt-16 text-white"><p class="font-semibold leading-tight">{{ $c->name }}</p><p class="text-xs text-white/70">{{ $c->active_count }} products</p></div>
             </a>
         @endforeach
     </div>
@@ -73,14 +73,14 @@
 @endforeach
 
 {{-- ============ Shop by phone ============ --}}
-<section class="bg-ink section text-white">
+<section class="bg-deep section text-white">
     <div class="container-x">
         <p class="eyebrow !text-white/60">Compatibility</p><h2 class="h-section mt-1">Find accessories for your phone</h2>
         <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($deviceBrands as $b)
                 <div class="rounded-3xl bg-white/5 p-6 ring-1 ring-white/10">
                     <p class="font-semibold">{{ $b->name }}</p>
-                    <div class="mt-4 flex flex-wrap gap-2">@foreach ($b->deviceModels as $m)<a class="rounded-full border border-white/15 px-3 py-1.5 text-sm text-white/80 transition hover:border-white hover:bg-white hover:text-ink" href="{{ route('device', [$b, $m]) }}">{{ $m->name }}</a>@endforeach</div>
+                    <div class="mt-4 flex flex-wrap gap-2">@foreach ($b->deviceModels as $m)<a class="rounded-full border border-white/15 px-3 py-1.5 text-sm text-white/80 transition hover:border-white hover:bg-surface hover:text-ink" href="{{ route('device', [$b, $m]) }}">{{ $m->name }}</a>@endforeach</div>
                 </div>
             @endforeach
         </div>
@@ -96,7 +96,7 @@
         <ul class="mt-6 grid max-w-2xl gap-2 text-white/90 sm:grid-cols-2">
             <li>✓ Quantity-based price tiers</li><li>✓ Bulk order by SKU or CSV upload</li><li>✓ Request a custom quote</li><li>✓ Wholesale order history</li>
         </ul>
-        <div class="mt-8 flex flex-wrap gap-3"><a href="{{ route('wholesale.register') }}" class="btn bg-white !px-7 !py-3.5 text-ink hover:bg-accent-soft">Apply for a wholesale account</a><a href="{{ route('contact') }}" class="btn border border-white/40 !px-7 !py-3.5 text-white hover:bg-white/10">Talk to sales</a></div>
+        <div class="mt-8 flex flex-wrap gap-3"><a href="{{ route('wholesale.register') }}" class="btn bg-surface !px-7 !py-3.5 text-ink hover:bg-accent-soft">Apply for a wholesale account</a><a href="{{ route('contact') }}" class="btn border border-white/40 !px-7 !py-3.5 text-white hover:bg-white/10">Talk to sales</a></div>
     </div>
 </section>
 
@@ -104,7 +104,7 @@
 <section class="container-x pb-4">
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         @foreach ($trust as $title => $text)
-            <div class="card-lift rounded-3xl border border-line bg-white p-6"><p class="font-semibold">{{ $title }}</p><p class="mt-2 text-sm text-ink-soft">{{ $text }}</p></div>
+            <div class="card-lift rounded-3xl border border-line bg-surface p-6"><p class="font-semibold">{{ $title }}</p><p class="mt-2 text-sm text-ink-soft">{{ $text }}</p></div>
         @endforeach
     </div>
 </section>
@@ -127,7 +127,7 @@
 @if ($faqs->isNotEmpty())
 <section class="section container-x max-w-3xl">
     <h2 class="h-section text-center">Frequently asked questions</h2>
-    <div class="mt-8 divide-y divide-line rounded-3xl border border-line bg-white px-6">
+    <div class="mt-8 divide-y divide-line rounded-3xl border border-line bg-surface px-6">
         @foreach ($faqs as $f)
             <details class="group py-5">
                 <summary class="flex cursor-pointer list-none items-center justify-between font-medium">{{ $f->question }}<span class="text-xl text-accent transition group-open:rotate-45">+</span></summary>

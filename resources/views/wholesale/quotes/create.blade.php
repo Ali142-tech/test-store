@@ -3,7 +3,7 @@
 <div class="container-x max-w-3xl py-12" x-data="{ rows: [{ sku: '', quantity: 100, target_price: '' }] }">
     <h1 class="text-3xl font-semibold tracking-tight">Request a quote</h1>
     <p class="mt-2 text-ink-soft">List the products, quantities and your target prices. Our team will reply with a formal quote.</p>
-    @error('items')<p class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-danger" role="alert">{{ $message }}</p>@enderror
+    @error('items')<p class="mt-4 rounded-xl bg-red-50 dark:bg-red-950/40 p-3 text-sm text-danger" role="alert">{{ $message }}</p>@enderror
     <form method="post" action="{{ route('quotes.store') }}" class="mt-8 space-y-3">@csrf
         <template x-for="(r, i) in rows" :key="i">
             <div class="grid grid-cols-[1fr_6rem_8rem_auto] gap-2">

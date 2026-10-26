@@ -10,7 +10,7 @@
     @if ($quote)<p class="mt-2 text-sm text-ink-soft">Quote {{ $quote->reference }}: agreed prices are applied.</p>@endif
 
     @if ($errors->has('checkout'))
-        <div class="mt-4 rounded-xl bg-red-50 p-4 text-sm text-danger" role="alert">
+        <div class="mt-4 rounded-xl bg-red-50 dark:bg-red-950/40 p-4 text-sm text-danger" role="alert">
             @foreach ($errors->get('checkout') as $group) @foreach ((array) $group as $m)<p>{{ $m }}</p>@endforeach @endforeach
         </div>
     @endif
@@ -96,7 +96,7 @@
             <h2 class="font-semibold">6. Review order</h2>
             <ul class="mt-4 space-y-3 text-sm">
                 @foreach ($calc['lines'] as $l)
-                    <li class="flex items-center justify-between gap-3"><span class="flex items-center gap-3">@if ($img = $l['variant']->imageUrl())<img src="{{ $img }}" alt="" class="h-12 w-12 shrink-0 rounded-lg bg-white object-contain ring-1 ring-line">@endif<span class="min-w-0 break-words">{{ $l['quantity'] }} × {{ $l['variant']->displayName() }}</span></span><span>{{ Money::format($l['line_total']) }}</span></li>
+                    <li class="flex items-center justify-between gap-3"><span class="flex items-center gap-3">@if ($img = $l['variant']->imageUrl())<img src="{{ $img }}" alt="" class="photo-bg h-12 w-12 shrink-0 rounded-lg object-contain ring-1 ring-line">@endif<span class="min-w-0 break-words">{{ $l['quantity'] }} × {{ $l['variant']->displayName() }}</span></span><span>{{ Money::format($l['line_total']) }}</span></li>
                 @endforeach
             </ul>
             <template x-for="e in errors"><p class="mt-3 text-sm text-danger" x-text="e" role="alert"></p></template>

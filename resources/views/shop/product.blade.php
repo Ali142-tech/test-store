@@ -64,12 +64,12 @@ function productPage(variants, symbol) {
 
     <div class="mt-6 grid gap-10 lg:grid-cols-2">
         <div>
-            <div class="relative aspect-square overflow-hidden rounded-[var(--radius-card)] bg-mist ring-1 ring-line">
+            <div class="photo-bg relative aspect-square overflow-hidden rounded-[var(--radius-card)] ring-1 ring-line">
                 <template x-if="gallery.length"><img :src="gallery[img].url" :alt="gallery[img].alt" class="h-full w-full object-contain p-2"></template>
                 <template x-if="!gallery.length"><div class="flex h-full items-center justify-center bg-gradient-to-br from-accent-soft to-mist text-7xl font-semibold text-accent/50" aria-hidden="true">{{ mb_substr($product->name, 0, 1) }}</div></template>
             </div>
             <div class="mt-3 flex gap-2 overflow-x-auto" x-show="gallery.length > 1">
-                <template x-for="(g, k) in gallery" :key="g.url"><button type="button" @click="img = k" class="h-16 w-16 shrink-0 overflow-hidden rounded-xl border bg-mist" :class="img === k ? 'border-accent' : 'border-line'"><img :src="g.url" alt="" class="h-full w-full object-contain" loading="lazy"></button></template>
+                <template x-for="(g, k) in gallery" :key="g.url"><button type="button" @click="img = k" class="photo-bg h-16 w-16 shrink-0 overflow-hidden rounded-xl border" :class="img === k ? 'border-accent' : 'border-line'"><img :src="g.url" alt="" class="h-full w-full object-contain" loading="lazy"></button></template>
             </div>
         </div>
 
@@ -117,7 +117,7 @@ function productPage(variants, symbol) {
                 </div>
             </template>
 
-            @error('cart') <p class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-danger" role="alert">{{ $message }}</p> @enderror
+            @error('cart') <p class="mt-4 rounded-xl bg-red-50 dark:bg-red-950/40 p-3 text-sm text-danger" role="alert">{{ $message }}</p> @enderror
             <form method="post" action="{{ route('cart.add') }}" class="mt-6 flex flex-wrap items-center gap-3">
                 @csrf
                 <input type="hidden" name="variant_id" :value="v.id">

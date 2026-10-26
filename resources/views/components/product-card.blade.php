@@ -6,9 +6,9 @@
     $available = $product->relationLoaded('variants') && $product->variants->isNotEmpty() ? $product->variants->sum(fn ($x) => $x->available()) : ($v?->available() ?? 0);
     $onSale = $v?->onSale();
 @endphp
-<article class="card-lift group relative rounded-3xl bg-white p-2 ring-1 ring-line">
+<article class="card-lift group relative rounded-3xl bg-surface p-2 ring-1 ring-line">
     <a href="{{ route('product', $product) }}" class="block">
-        <div class="relative aspect-square overflow-hidden rounded-[1.25rem] bg-mist">
+        <div class="photo-bg relative aspect-square overflow-hidden rounded-[1.25rem] bg-mist">
             @if ($img)
                 <img src="{{ $img }}" alt="{{ $product->name }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
             @else
@@ -16,7 +16,7 @@
             @endif
             <div class="absolute left-3 top-3 flex gap-1.5">
                 @if ($onSale) <span class="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-white">Sale</span> @endif
-                @if ($product->type === 'bundle') <span class="rounded-full bg-ink px-2.5 py-1 text-xs font-semibold text-white">Bundle</span> @endif
+                @if ($product->type === 'bundle') <span class="rounded-full bg-deep px-2.5 py-1 text-xs font-semibold text-white">Bundle</span> @endif
             </div>
             @if ($v && $available === 0) <span class="absolute right-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-medium text-ink-soft">Out of stock</span> @endif
         </div>

@@ -20,14 +20,39 @@
     @if (! empty($ogImage)) <meta property="og:image" content="{{ $ogImage }}"> @endif
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet">
+    <script>
+        // Apply the saved theme (else the device setting) before first paint, so there is no light/dark flash.
+        (function () {
+            try {
+                var saved = localStorage.getItem('theme');
+                var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.classList.toggle('dark', dark);
+            } catch (e) {}
+            // Reflect the real state on the toggle once the page is ready, and follow the device setting until the visitor chooses.
+            document.addEventListener('DOMContentLoaded', function () {
+                var on = document.documentElement.classList.contains('dark');
+                document.querySelectorAll('[data-theme-toggle]').forEach(function (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+            });
+            try {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+                    if (!localStorage.getItem('theme')) { document.documentElement.classList.toggle('dark', e.matches); }
+                });
+            } catch (e) {}
+            window.toggleTheme = function () {
+                var dark = document.documentElement.classList.toggle('dark');
+                try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+                document.querySelectorAll('[data-theme-toggle]').forEach(function (b) { b.setAttribute('aria-pressed', dark ? 'true' : 'false'); });
+            };
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
 <body x-data="{ menu: false, search: false }" class="min-h-screen flex flex-col">
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3">Skip to content</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-surface focus:p-3">Skip to content</a>
 
     @if ($announcement = StoreSetting::get('announcement'))
-        <div class="bg-gradient-to-r from-ink via-[#241a52] to-ink text-center text-xs sm:text-sm text-white py-2.5 px-4 tracking-wide">{{ $announcement }}</div>
+        <div class="bg-gradient-to-r from-deep via-[#241a52] to-deep text-center text-xs sm:text-sm text-white py-2.5 px-4 tracking-wide">{{ $announcement }}</div>
     @endif
 
     <header class="glass sticky top-0 z-40 border-b border-line/70">
@@ -52,6 +77,9 @@
             </form>
 
             <div class="ml-auto flex items-center gap-0.5 text-sm font-medium md:ml-0">
+                <button type="button" data-theme-toggle onclick="toggleTheme()" class="p-2" aria-label="Switch between light and dark theme" aria-pressed="false" title="Light / dark theme">
+                    <svg class="h-6 w-6 dark:hidden" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+                    <svg class="hidden h-6 w-6 dark:block" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
                 <button type="button" class="p-2 md:hidden" @click="search = !search" :aria-expanded="search" aria-label="Search">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
                 @auth
@@ -70,7 +98,7 @@
             </div>
         </div>
     </header>
-    <div x-cloak x-show="search" x-transition class="border-b border-line bg-white md:hidden">
+    <div x-cloak x-show="search" x-transition class="border-b border-line bg-surface md:hidden">
         <form action="{{ route('search') }}" method="get" role="search" class="container-x flex gap-2 py-3">
             <label class="sr-only" for="q-m">Search</label>
             <input id="q-m" name="q" value="{{ request('q') }}" type="search" placeholder="Search products, SKU or phone model" class="field !rounded-full !py-2.5" x-effect="if (search) $nextTick(() => $el.focus())">
@@ -81,7 +109,7 @@
     {{-- Mobile drawer --}}
     <div x-cloak x-show="menu" class="fixed inset-0 z-50 lg:hidden" @keydown.escape.window="menu = false">
         <div class="absolute inset-0 bg-black/40" @click="menu = false"></div>
-        <aside class="absolute left-0 top-0 h-full w-80 max-w-[85%] bg-white p-6 overflow-y-auto" x-transition>
+        <aside class="absolute left-0 top-0 h-full w-80 max-w-[85%] bg-surface p-6 overflow-y-auto" x-transition>
             <div class="flex justify-between items-center mb-6">
                 <span class="text-lg font-bold">{{ $storeName }}</span>
                 <button @click="menu = false" aria-label="Close menu" class="p-2">✕</button>
@@ -134,7 +162,7 @@
         </div>
     </section>
 
-    <footer class="bg-ink text-white">
+    <footer class="bg-deep text-white">
         <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4 text-sm">
             <div>
                 <p class="text-lg font-bold">{{ $storeName }}<span class="text-accent">.</span></p>

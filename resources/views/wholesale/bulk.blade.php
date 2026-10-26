@@ -6,8 +6,8 @@
     <h1 class="text-3xl font-semibold tracking-tight">Bulk order</h1>
     <p class="mt-2 text-ink-soft">Add many products at once. Wholesale prices and minimum quantities are applied by our server.</p>
 
-    @if ($errors->has('bulk'))<ul class="mt-4 list-disc space-y-1 rounded-xl bg-amber-50 p-4 pl-8 text-sm text-warn" role="alert">@foreach ($errors->get('bulk') as $g)@foreach ((array) $g as $m)<li>{{ $m }}</li>@endforeach @endforeach</ul>@endif
-    @error('lines')<p class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-danger" role="alert">{{ $message }}</p>@enderror
+    @if ($errors->has('bulk'))<ul class="mt-4 list-disc space-y-1 rounded-xl bg-amber-50 dark:bg-amber-950/40 p-4 pl-8 text-sm text-warn" role="alert">@foreach ($errors->get('bulk') as $g)@foreach ((array) $g as $m)<li>{{ $m }}</li>@endforeach @endforeach</ul>@endif
+    @error('lines')<p class="mt-4 rounded-xl bg-red-50 dark:bg-red-950/40 p-3 text-sm text-danger" role="alert">{{ $message }}</p>@enderror
 
     <form method="post" action="{{ route('wholesale.bulk.add') }}" enctype="multipart/form-data" class="mt-8 space-y-4">@csrf
         <label for="lines" class="text-sm font-medium">Quick order: one "SKU, quantity" per line</label>

@@ -5,7 +5,7 @@
 <div class="container-x py-10">
     <h1 class="text-3xl font-semibold tracking-tight">Your cart</h1>
 
-    @if ($errors->has('cart'))<p class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-danger" role="alert">{{ $errors->first('cart') }}</p>@endif
+    @if ($errors->has('cart'))<p class="mt-4 rounded-xl bg-red-50 dark:bg-red-950/40 p-3 text-sm text-danger" role="alert">{{ $errors->first('cart') }}</p>@endif
 
     @if (empty($calc['lines']))
         <div class="mt-10 rounded-2xl border border-dashed border-line p-14 text-center">
@@ -15,12 +15,12 @@
     @else
     <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_22rem]">
         <div>
-            @foreach ($calc['errors'] as $e) <p class="mb-3 rounded-xl bg-amber-50 p-3 text-sm text-warn" role="alert">{{ $e }}</p> @endforeach
+            @foreach ($calc['errors'] as $e) <p class="mb-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 p-3 text-sm text-warn" role="alert">{{ $e }}</p> @endforeach
             <ul class="divide-y divide-line border-y border-line">
                 @foreach ($calc['lines'] as $l)
                     @php $v = $l['variant']; @endphp
                     <li class="flex flex-wrap gap-x-4 gap-y-2 py-5 sm:flex-nowrap">
-                        <a href="{{ route('product', $v->product) }}" class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-mist ring-1 ring-line">@if ($img = $v->imageUrl())<img src="{{ $img }}" alt="{{ $v->product->name }}" class="h-full w-full object-contain" loading="lazy">@else<span class="text-2xl font-semibold text-accent/60">{{ mb_substr($v->product->name, 0, 1) }}</span>@endif</a>
+                        <a href="{{ route('product', $v->product) }}" class="flex h-24 w-24 shrink-0 photo-bg flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-line">@if ($img = $v->imageUrl())<img src="{{ $img }}" alt="{{ $v->product->name }}" class="h-full w-full object-contain" loading="lazy">@else<span class="text-2xl font-semibold text-accent/60">{{ mb_substr($v->product->name, 0, 1) }}</span>@endif</a>
                         <div class="min-w-0 flex-1">
                             <a href="{{ route('product', $v->product) }}" class="break-words font-medium">{{ $v->product->name }}</a>
                             @if ($v->name)<p class="text-sm text-ink-soft">{{ $v->name }}</p>@endif

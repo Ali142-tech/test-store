@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Class-based dark mode: <html class="dark"> (set from the visitor's saved choice, else their device setting). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source "../**/*.blade.php";
@@ -8,6 +11,8 @@
 /* Design tokens: premium, minimal, electric-violet accent. Change here to re-theme the whole store. */
 @theme {
     --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --color-surface: #ffffff;          /* page / card background */
+    --color-deep: #0f1115;             /* always-dark panels (footer, dark sections) in BOTH themes */
     --color-ink: #0f1115;
     --color-ink-soft: #4b5160;
     --color-mist: #f5f6f8;
@@ -21,24 +26,43 @@
     --radius-card: 1.25rem;
 }
 
+/* Dark theme: only the token VALUES change; every utility reads them at runtime. */
+:root.dark {
+    color-scheme: dark;
+    --color-surface: #11131a;
+    --color-deep: #0a0b10;
+    --color-ink: #f1f2f6;
+    --color-ink-soft: #a6acbb;
+    --color-mist: #1a1d27;
+    --color-line: #2b3040;
+    --color-accent: #8266ff;
+    --color-accent-dark: #6d4df0;
+    --color-accent-soft: #2a2250;
+    --color-ok: #34d399;
+    --color-warn: #fbbf24;
+    --color-danger: #f87171;
+}
+
 @layer base {
     html { scroll-behavior: smooth; }
-    body { @apply bg-white text-ink antialiased font-sans; }
+    body { @apply bg-surface text-ink antialiased font-sans; }
     :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
     [x-cloak] { display: none !important; }
 }
 
 @layer components {
     .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition min-h-11 cursor-pointer; }
-    .btn-primary { @apply bg-ink text-white hover:bg-accent; }
+    .btn-primary { @apply bg-ink text-surface hover:bg-accent hover:text-white; }
     .btn-accent { @apply bg-accent text-white hover:bg-accent-dark; }
-    .btn-ghost { @apply border border-line bg-white text-ink hover:border-ink; }
+    .btn-ghost { @apply border border-line bg-surface text-ink hover:border-ink; }
     .container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
     .section { @apply py-14 sm:py-20; }
     .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.18em] text-accent; }
     .h-section { @apply text-2xl font-semibold tracking-tight sm:text-3xl; }
     .chip { @apply inline-flex items-center rounded-full border border-line px-3 py-1.5 text-sm hover:border-ink; }
-    .field { @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-sm focus:border-accent focus:outline-none; }
+    .field { @apply w-full min-w-0 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink placeholder:text-ink-soft/70 focus:border-accent focus:outline-none; }
+    /* Product photos have white backgrounds: keep their tile white in both themes. */
+    .photo-bg { background-color: #ffffff; }
 }
 
 /* ---- Visual polish ---- */
@@ -55,7 +79,12 @@
         radial-gradient(60rem 30rem at 85% -10%, rgba(91,61,245,.22), transparent 60%),
         radial-gradient(40rem 26rem at -5% 20%, rgba(192,38,211,.14), transparent 60%),
         radial-gradient(34rem 22rem at 60% 110%, rgba(249,115,22,.12), transparent 60%),
-        #fbfbfe; }
+        var(--color-surface); }
+    :root.dark .mesh { background:
+        radial-gradient(60rem 30rem at 85% -10%, rgba(130,102,255,.28), transparent 60%),
+        radial-gradient(40rem 26rem at -5% 20%, rgba(192,38,211,.16), transparent 60%),
+        radial-gradient(34rem 22rem at 60% 110%, rgba(249,115,22,.10), transparent 60%),
+        var(--color-surface); }
     .marquee-track { display: flex; width: max-content; animation: marquee 38s linear infinite; }
     .marquee:hover .marquee-track { animation-play-state: paused; }
 }
@@ -63,7 +92,7 @@
 @layer components {
     .card-lift { @apply transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_45px_-20px_rgba(15,17,21,.35)]; }
     .pill { @apply inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent-soft/70 px-3 py-1 text-xs font-semibold text-accent; }
-    .glass { @apply bg-white/75 backdrop-blur-xl; }
+    .glass { background-color: color-mix(in srgb, var(--color-surface) 78%, transparent); @apply backdrop-blur-xl; }
 }
 
 @media (prefers-reduced-motion: reduce) { .anim-up, .anim-float, .marquee-track { animation: none !important; } }

@@ -113,3 +113,14 @@ it('shows account links in the drawer for signed-in customers', function () {
 it('links to the admin login from the footer', function () {
     $this->get('/')->assertSee(url('/admin/login'), false)->assertSee('Admin login');
 });
+
+it('ships a light/dark theme: pre-paint script, toggle button, dark tokens in the built CSS', function () {
+    $html = $this->get('/')->getContent();
+    expect($html)->toContain("localStorage.getItem('theme')")        // saved choice, else device setting, applied before first paint
+        ->and($html)->toContain('data-theme-toggle')
+        ->and($html)->toContain('toggleTheme()')
+        ->and($html)->toContain('bg-surface');                        // views use theme tokens, not fixed white
+
+    $css = collect(glob(public_path('build/assets/*.css')))->map(fn ($f) => file_get_contents($f))->implode('');
+    expect($css)->toContain(':root.dark')->toContain('--color-surface');
+});
