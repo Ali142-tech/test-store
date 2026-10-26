@@ -70,6 +70,14 @@ class ProductVariant extends Model
         return $this->onSale() ? (string) $this->sale_price : (string) $this->price;
     }
 
+    /** This colour's own photo, else the product's main photo. */
+    public function imageUrl(): ?string
+    {
+        $images = $this->product->images;
+
+        return ($images->firstWhere('product_variant_id', $this->id) ?? $images->first())?->url();
+    }
+
     public function displayName(): string
     {
         return trim($this->product->name.($this->name ? ' - '.$this->name : ''));

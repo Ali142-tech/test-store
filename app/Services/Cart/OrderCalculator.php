@@ -32,7 +32,7 @@ class OrderCalculator
         $subtotal = '0.00';
         $weight = 0.0;
 
-        $variants = ProductVariant::with('product', 'tiers')->whereIn('id', collect($input)->pluck('variant_id'))->get()->keyBy('id');
+        $variants = ProductVariant::with('product.images', 'tiers')->whereIn('id', collect($input)->pluck('variant_id'))->get()->keyBy('id');
 
         foreach ($input as $row) {
             $variant = $variants->get($row['variant_id']);

@@ -20,7 +20,7 @@
                 @foreach ($calc['lines'] as $l)
                     @php $v = $l['variant']; @endphp
                     <li class="flex gap-4 py-5">
-                        <a href="{{ route('product', $v->product) }}" class="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent-soft to-mist text-2xl font-semibold text-accent/60">{{ mb_substr($v->product->name, 0, 1) }}</a>
+                        <a href="{{ route('product', $v->product) }}" class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-mist ring-1 ring-line">@if ($img = $v->imageUrl())<img src="{{ $img }}" alt="{{ $v->product->name }}" class="h-full w-full object-contain" loading="lazy">@else<span class="text-2xl font-semibold text-accent/60">{{ mb_substr($v->product->name, 0, 1) }}</span>@endif</a>
                         <div class="flex-1">
                             <a href="{{ route('product', $v->product) }}" class="font-medium">{{ $v->product->name }}</a>
                             @if ($v->name)<p class="text-sm text-ink-soft">{{ $v->name }}</p>@endif

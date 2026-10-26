@@ -289,3 +289,17 @@ it('lets a guest see their order only via the just-placed session, a signed link
     $this->post('/track-order', ['reference' => $order->reference, 'email' => 'wrong@example.com'])->assertSessionHasErrors('reference');
     $this->post('/track-order', ['reference' => $order->reference, 'email' => 'buyer@example.com'])->assertRedirect();
 });
+
+it('shows the product photo (colour-specific when available) in the cart and checkout', function () {
+    $a = $this->variant;
+    $b = $a->product->variants()->create(['sku' => 'IMG-B', 'name' => 'Blue', 'color' => 'Blue', 'price' => 1000, 'stock_quantity' => 5]);
+    \App\Models\ProductImage::create(['product_id' => $a->product_id, 'path' => 'products/main.webp', 'alt' => 'main', 'sort_order' => 0]);
+    \App\Models\ProductImage::create(['product_id' => $a->product_id, 'product_variant_id' => $b->id, 'path' => 'products/blue.webp', 'alt' => 'blue', 'sort_order' => 1]);
+
+    addToCart($this, $b, 1);
+    $this->get('/cart')->assertSee('products/blue.webp', false)->assertDontSee('products/main.webp', false);
+    $this->get('/checkout')->assertSee('products/blue.webp', false);
+
+    $this->post('/cart/add', ['variant_id' => $a->id, 'quantity' => 1]);
+    $this->get('/cart')->assertSee('products/main.webp', false); // no own photo -> product's main photo
+});

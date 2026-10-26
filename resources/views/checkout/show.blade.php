@@ -96,7 +96,7 @@
             <h2 class="font-semibold">6. Review order</h2>
             <ul class="mt-4 space-y-3 text-sm">
                 @foreach ($calc['lines'] as $l)
-                    <li class="flex justify-between gap-3"><span>{{ $l['quantity'] }} × {{ $l['variant']->displayName() }}</span><span>{{ Money::format($l['line_total']) }}</span></li>
+                    <li class="flex items-center justify-between gap-3"><span class="flex items-center gap-3">@if ($img = $l['variant']->imageUrl())<img src="{{ $img }}" alt="" class="h-12 w-12 shrink-0 rounded-lg bg-white object-contain ring-1 ring-line">@endif<span>{{ $l['quantity'] }} × {{ $l['variant']->displayName() }}</span></span><span>{{ Money::format($l['line_total']) }}</span></li>
                 @endforeach
             </ul>
             <template x-for="e in errors"><p class="mt-3 text-sm text-danger" x-text="e" role="alert"></p></template>
