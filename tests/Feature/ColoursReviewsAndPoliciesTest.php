@@ -100,3 +100,28 @@ it('offers the review form on the product page only to customers who received th
     \App\Models\Review::first()->forceFill(['status' => 'approved'])->save();
     $this->get($url)->assertSee('Works well')->assertSee('Verified purchase');
 });
+
+it('labels sample reviews, keeps them out of structured data, and can purge them without touching real ones', function () {
+    $v = makeVariant(['wholesale_enabled' => false]);
+    $this->seed(\Database\Seeders\SampleReviewsSeeder::class); // makeVariant has no images, so no samples are attached to it
+    expect(\App\Models\Review::count())->toBe(0);
+
+    $sampleUser = \App\Models\User::factory()->create(['email' => 's1@sample.invalid']);
+    $realUser = \App\Models\User::factory()->create();
+    \App\Models\Review::create(['product_id' => $v->product_id, 'user_id' => $sampleUser->id, 'rating' => 5, 'body' => 'Demo text'])->forceFill(['status' => 'approved', 'is_sample' => true])->save();
+
+    $html = $this->get(route('product', $v->product))->assertSee('Sample review')->getContent();
+    expect($html)->not->toContain('aggregateRating'); // samples never feed search engines
+
+    \App\Models\Review::create(['product_id' => $v->product_id, 'user_id' => $realUser->id, 'rating' => 4, 'body' => 'Real text'])->forceFill(['status' => 'approved'])->save();
+    expect($this->get(route('product', $v->product))->getContent())->toContain('aggregateRating')->toContain('"reviewCount":1');
+
+    $this->artisan('reviews:purge-samples')->assertSuccessful();
+    expect(\App\Models\Review::pluck('body')->all())->toBe(['Real text']);
+});
+
+it('never seeds sample reviews in production', function () {
+    $this->app['env'] = 'production';
+    (new \Database\Seeders\SampleReviewsSeeder)->run();
+    expect(\App\Models\Review::count())->toBe(0)->and(\App\Models\User::where('email', 'like', '%@sample.invalid')->count())->toBe(0);
+});

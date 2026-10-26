@@ -52,6 +52,8 @@ class ProductController extends Controller
 
         return view('shop.product', [
             'recent' => $recent,
+            // Structured data (search engines) only ever uses genuine reviews, never demo samples.
+            'realReviews' => (object) ['count' => (int) $product->reviews()->where('is_sample', false)->count(), 'avg' => (float) $product->reviews()->where('is_sample', false)->avg('rating')],
             // A review form is offered only to signed-in customers who have received this product.
             'canReview' => $user && \App\Models\OrderItem::where('product_id', $product->id)->whereHas('order', fn ($q) => $q->where('user_id', $user->id)->where('status', 'delivered'))->exists(),
             'myReview' => $user ? \App\Models\Review::where('product_id', $product->id)->where('user_id', $user->id)->first() : null,

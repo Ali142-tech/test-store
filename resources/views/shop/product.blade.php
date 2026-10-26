@@ -19,7 +19,7 @@
     'image' => $product->images->map->url()->all() ?: null,
     'offers' => $first ? ['@type' => 'Offer', 'priceCurrency' => 'PKR', 'price' => $first['price'], 'availability' => $first['available'] > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', 'url' => url()->current()] : null,
     // Rating markup only when genuine approved reviews exist.
-    'aggregateRating' => $product->reviews_count > 0 ? ['@type' => 'AggregateRating', 'ratingValue' => round($product->reviews_avg_rating, 1), 'reviewCount' => $product->reviews_count] : null,
+    'aggregateRating' => $realReviews->count > 0 ? ['@type' => 'AggregateRating', 'ratingValue' => round($realReviews->avg, 1), 'reviewCount' => $realReviews->count] : null,
 ]), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}
 </script>
 @endpush
@@ -171,7 +171,7 @@ function productPage(variants, symbol) {
             <div class="mt-4 border-b border-line pb-4">
                 <p class="text-sm"><span class="text-amber-500">{{ str_repeat('★', $r->rating) }}</span> <strong>{{ $r->title }}</strong></p>
                 <p class="mt-1 text-sm text-ink-soft">{{ $r->body }}</p>
-                <p class="mt-1 text-xs text-ink-soft">{{ $r->user->name }} @if ($r->is_verified_purchase) · Verified purchase @endif</p>
+                <p class="mt-1 text-xs text-ink-soft">{{ $r->user->name }} @if ($r->is_verified_purchase) · Verified purchase @endif @if ($r->is_sample) <span class="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">Sample review</span> @endif</p>
             </div>
         @empty
             <p class="mt-3 text-sm text-ink-soft">No reviews yet.</p>

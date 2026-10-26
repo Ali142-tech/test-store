@@ -63,6 +63,7 @@ return new class extends Migration
             $table->string('title')->nullable();
             $table->text('body')->nullable();
             $table->boolean('is_verified_purchase')->default(false);
+            $table->boolean('is_sample')->default(false)->index(); // demo content, never real feedback
             $table->string('status', 20)->default('pending')->index(); // pending|approved|rejected
             $table->timestamps();
             $table->unique(['product_id', 'user_id']);
