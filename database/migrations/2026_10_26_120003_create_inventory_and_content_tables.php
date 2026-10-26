@@ -68,6 +68,19 @@ return new class extends Migration
             $table->unique(['product_id', 'user_id']);
         });
 
+        // Public reviews copied from OTHER stores. Always shown with attribution; never counted in this store's own ratings.
+        Schema::create('external_reviews', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->string('source', 60);
+            $table->string('source_url', 500)->nullable();
+            $table->string('reviewer_name', 120);
+            $table->unsignedTinyInteger('rating');
+            $table->text('body');
+            $table->date('reviewed_on')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('newsletter_subscribers', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
@@ -145,7 +158,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        foreach (['audit_logs', 'store_settings', 'faqs', 'pages', 'banners', 'contact_messages', 'newsletter_subscribers', 'reviews', 'stock_movements', 'purchase_order_items', 'purchase_orders', 'suppliers'] as $t) {
+        foreach (['external_reviews', 'audit_logs', 'store_settings', 'faqs', 'pages', 'banners', 'contact_messages', 'newsletter_subscribers', 'reviews', 'stock_movements', 'purchase_order_items', 'purchase_orders', 'suppliers'] as $t) {
             Schema::dropIfExists($t);
         }
     }

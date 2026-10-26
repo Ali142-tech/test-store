@@ -14,9 +14,7 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $cards = fn () => Product::query()->active()
-            ->with(['defaultVariant', 'images', 'brand'])
-            ->withAvg('reviews', 'rating')->withCount('reviews');
+        $cards = fn () => Product::query()->active()->inStock()->forCards();
 
         return view('home', [
             'hero' => Banner::where('placement', 'hero')->where('is_active', true)

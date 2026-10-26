@@ -92,6 +92,17 @@ class Product extends Model
             ->wherePivot('kind', 'related');
     }
 
+    public function externalReviews(): HasMany
+    {
+        return $this->hasMany(ExternalReview::class)->latest('reviewed_on');
+    }
+
+    /** Everything a product card needs, in one eager-loaded query set (incl. colour options). */
+    public function scopeForCards(Builder $q): Builder
+    {
+        return $q->with(['defaultVariant', 'variants' => fn ($v) => $v->where('is_active', true), 'images', 'brand'])->withAvg('reviews', 'rating')->withCount('reviews');
+    }
+
     public function scopeActive(Builder $q): Builder
     {
         return $q->where('status', 'active');
@@ -105,5 +116,11 @@ class Product extends Model
     public function primaryImageUrl(): ?string
     {
         return $this->images->first()?->url();
+    }
+
+    /** Distinct colour names across active variants (for swatches). */
+    public function colorOptions(): \Illuminate\Support\Collection
+    {
+        return $this->variants->pluck('color')->filter()->unique()->values();
     }
 }

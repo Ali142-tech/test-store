@@ -92,7 +92,7 @@ class AccountController extends Controller
     public function wishlist(Request $request)
     {
         $products = Product::active()->whereIn('id', $request->user()->wishlistItems()->pluck('product_id'))
-            ->with(['defaultVariant', 'images', 'brand'])->withAvg('reviews', 'rating')->withCount('reviews')->get();
+            ->forCards()->get();
 
         return view('account.wishlist', compact('products'));
     }

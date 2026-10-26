@@ -9,7 +9,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([RolesSeeder::class, ContentSeeder::class]);
+        $this->call([RolesSeeder::class, ContentSeeder::class, PolicyPagesSeeder::class]);
 
         // Demo data and a known-password admin only outside production.
         if (! app()->isProduction()) {

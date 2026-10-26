@@ -18,9 +18,18 @@ class ProductController extends Controller
 
         $user = $request->user();
 
+        // Gallery per colour: a variant's own photos, else the shared (variant-less) photos, else everything.
+        $byVariant = $product->images->groupBy('product_variant_id');
+        $shared = $byVariant->get('', collect());
+        $gallery = fn ($variantId) => ($byVariant->get($variantId) ?? ($shared->isNotEmpty() ? $shared : $product->images))
+            ->map(fn ($i) => ['url' => $i->url(), 'alt' => $i->alt ?: $product->name])->values();
+
         $variants = $product->variants->map(fn ($v) => [
             'id' => $v->id,
             'name' => $v->name,
+            'color' => $v->color,
+            'swatch' => \App\Support\ColorMap::css($v->color),
+            'images' => $gallery($v->id),
             'sku' => $v->sku,
             'price' => $prices->resolve($v, 1, $user)['price'],
             'regular_price' => (string) $v->price,
@@ -34,15 +43,16 @@ class ProductController extends Controller
         ])->values();
 
         $related = Product::active()->where('category_id', $product->category_id)->whereKeyNot($product->id)
-            ->with(['defaultVariant', 'images', 'brand'])->withAvg('reviews', 'rating')->withCount('reviews')->limit(4)->get();
+            ->forCards()->limit(4)->get();
 
         // Recently viewed (per-session ids only; no personal data stored).
         $seen = collect(session('recently_viewed', []))->reject(fn ($id) => $id === $product->id)->prepend($product->id)->take(9)->values();
         session(['recently_viewed' => $seen->all()]);
-        $recent = Product::active()->whereIn('id', $seen->slice(1))->with(['defaultVariant', 'images', 'brand'])->get()->sortBy(fn ($p) => $seen->search($p->id))->values();
+        $recent = Product::active()->whereIn('id', $seen->slice(1))->forCards()->get()->sortBy(fn ($p) => $seen->search($p->id))->values();
 
         return view('shop.product', [
             'recent' => $recent,
+            'externalReviews' => $product->externalReviews()->limit(5)->get(),
             'product' => $product,
             'variants' => $variants,
             'related' => $related,

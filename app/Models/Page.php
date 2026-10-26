@@ -24,7 +24,7 @@ class Page extends Model
     /** Admin-authored HTML with scripts, event handlers and javascript: URLs removed (defence in depth). */
     public function safeBody(): string
     {
-        $html = (string) $this->body;
+        $html = $this->withTokens((string) $this->body);
         if (trim($html) === '') {
             return '';
         }
@@ -56,5 +56,21 @@ class Page extends Model
         }
 
         return $out;
+    }
+
+    /** Replaces {store_name}, {contact_email}, {contact_phone}, {contact_link}, {updated_date} with live store settings. */
+    private function withTokens(string $html): string
+    {
+        $email = StoreSetting::get('contact_email');
+        $phone = StoreSetting::get('contact_phone');
+        $link = '<a href="'.e(route('contact')).'">our contact page</a>';
+
+        return strtr($html, [
+            '{store_name}' => e(StoreSetting::get('store_name', config('app.name'))),
+            '{contact_email}' => $email ? e($email) : $link,
+            '{contact_phone}' => $phone ? e($phone) : $link,
+            '{contact_link}' => $email ? '<a href="mailto:'.e($email).'">'.e($email).'</a> or '.$link : $link,
+            '{updated_date}' => ($this->updated_at ?? now())->format('j F Y'),
+        ]);
     }
 }

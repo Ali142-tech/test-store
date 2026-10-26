@@ -10,17 +10,22 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 /**
- * Developer tool: collects real Pakistani listings (name, brand, price, colours, image) from PriceOye into
- * database/seed-assets/ so RealCatalogSeeder can run offline.
+ * Developer tool: collects real Pakistani listings from PriceOye into database/seed-assets/ so that
+ * RealCatalogSeeder can run offline: name, brand, PKR price, specifications, colour options with their own
+ * photo galleries and availability, and the public reviews shown for the product on the source site.
  *
- * LEGAL: product images and listing data belong to their owners (PriceOye, the brands and their photographers).
- * Check licence/permission before using them on a live store. Every record keeps its source_url for takedowns.
+ * LEGAL: product images, listing data and reviews belong to their owners (PriceOye, the brands, the reviewers).
+ * Get permission before using them on a live store. Every record keeps its source URL for attribution/takedown.
  */
 class ScrapeCatalog extends Command
 {
     protected $signature = 'catalog:scrape {--limit=0 : Max products per listing page (0 = all)} {--no-images}';
 
-    protected $description = 'Scrape real PriceOye listings + images into database/seed-assets';
+    protected $description = 'Scrape real PriceOye listings, colour galleries, specs and reviews into database/seed-assets';
+
+    private const IMAGE_BASE = 'https://images.priceoye.pk/';
+
+    private const MAX_IMAGES_PER_COLOR = 3;
 
     private const LISTINGS = [
         ['https://priceoye.pk/power-banks', 'Power Banks'],
@@ -44,51 +49,29 @@ class ScrapeCatalog extends Command
         $items = [];
 
         foreach (self::LISTINGS as [$url, $category]) {
-            $html = Http::withUserAgent(self::UA)->timeout(40)->get($url)->body();
-            $found = $this->parseListing($html, $category);
+            $found = $this->parseListing(Http::withUserAgent(self::UA)->timeout(40)->get($url)->body(), $category);
             $this->line(count($found)." cards from $url");
             foreach (($this->option('limit') ? array_slice($found, 0, (int) $this->option('limit')) : $found) as $it) {
-                $items[$it['page']] ??= $it;   // de-duplicate by product page
+                $items[$it['page']] ??= $it;
             }
             usleep(300000);
         }
 
-        $this->info(count($items).' unique in-stock products. Fetching details...');
+        $this->info(count($items).' unique products. Fetching details...');
         $out = [];
         foreach ($items as $it) {
-            $detail = $this->detail($it['page']);
+            $detail = $this->detail($it);
             if ($detail === null) {
                 $this->warn("skip (no detail): {$it['name']}");
 
                 continue;
             }
-            $it = array_merge($it, $detail);
-            $slug = Str::slug($it['name']);
-            $it['image_file'] = null;
-
-            if (! $this->option('no-images') && $it['image']) {
-                $file = "$slug.webp";
-                $path = "$dir/images/$file";
-if (! File::exists($path)) {
-                    // The site serves an SVG "no image" placeholder for some products: only keep genuine WebP photos,
-                    // trying smaller renditions when the full-size file is a placeholder.
-                    foreach (['', '-500x500', '-270x270'] as $suffix) {
-                        $r = Http::withUserAgent(self::UA)->timeout(40)->get(preg_replace('/\.webp$/', $suffix.'.webp', $it['image']));
-                        $b = $r->body();
-                        if ($r->ok() && strlen($b) > 1000 && str_starts_with($b, 'RIFF') && substr($b, 8, 4) === 'WEBP') {
-                            File::put($path, $b);
-                            break;
-                        }
-                    }
-                }
-                $it['image_file'] = File::exists($path) ? $file : null;
-            }
-            $out[] = $it;
+            $out[] = $detail;
             usleep(250000);
         }
 
         File::put("$dir/catalog.json", json_encode($out, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        $this->info(count($out).' products written to database/seed-assets/catalog.json ('.count(File::files("$dir/images")).' images).');
+        $this->info(count($out).' products written; '.count(File::files("$dir/images")).' image files.');
 
         return self::SUCCESS;
     }
@@ -109,12 +92,10 @@ if (! File::exists($path)) {
             $page = $a?->getAttribute('href');
             $priceTxt = $xp->query('.//div[contains(@class,"price-box")]', $card)->item(0)?->textContent ?? '';
             $price = (int) preg_replace('/\D/', '', preg_replace('/^\s*Rs/i', '', trim($priceTxt)));
-            $text = strtolower($card->textContent);
-            if (! $name || ! $page || $price <= 0 || str_contains($text, 'out of stock')) {
+            if (! $name || ! $page || $price <= 0) {
                 continue;
             }
             $img = $xp->query('.//img', $card)->item(0)?->getAttribute('src');
-            // Thumbnails end in -100x100.webp; the same name without the suffix is the full-size image.
             $img = $img ? preg_replace('/-\d+x\d+\.webp$/', '.webp', $img) : null;
             $rows[] = ['name' => html_entity_decode($name), 'page' => $page, 'price' => $price, 'image' => $img, 'category' => $category];
         }
@@ -122,35 +103,140 @@ if (! File::exists($path)) {
         return $rows;
     }
 
-    /** @return array{brand:?string,colors:array<int,string>,source_name:string}|null */
-    private function detail(string $url): ?array
+    private function detail(array $it): ?array
     {
-        $r = Http::withUserAgent(self::UA)->timeout(40)->get($url);
-        if (! $r->ok()) {
+        $r = Http::withUserAgent(self::UA)->timeout(40)->get($it['page']);
+        $d = $r->ok() ? $this->state($r->body()) : null;
+        if (! $d) {
             return null;
         }
-        $html = $r->body();
-        $brand = null;
-        if (preg_match_all('#<script type="application/ld\+json">(.*?)</script>#s', $html, $m)) {
-            foreach ($m[1] as $j) {
-                $d = json_decode($j, true);
-                if (($d['@type'] ?? null) === 'Product') {
-                    $brand = is_array($d['brand'] ?? null) ? ($d['brand']['name'] ?? null) : ($d['brand'] ?? null);
+
+        $slug = Str::slug($it['name']);
+        $data = $d['dataSet'] ?? [];
+
+        // ---- specifications: {"Battery":[{"Capacity":"10000 mAh",...}], ...} -> ["Battery · Capacity" => "10000 mAh"]
+        $specs = [];
+        $raw = json_decode($data['specification'] ?? '', true);
+        foreach ((array) $raw as $group => $rows) {
+            foreach ((array) $rows as $row) {
+                foreach ((array) $row as $k => $v) {
+                    if (is_scalar($v) && trim((string) $v) !== '' && ! in_array(strtolower(trim((string) $v)), ['no', 'n/a', 'null'], true)) {
+                        $specs["$group · $k"] = trim((string) $v);
+                    }
                 }
             }
         }
 
+        // ---- colours: availability + price from dataPrices, galleries from product_color_images
         $colors = [];
-        $flat = preg_replace('/\s+/', ' ', preg_replace('/<[^>]+>/', '|', preg_replace('#<(script|style)\b.*?</\1>#s', ' ', $html)));
-        if (preg_match('/\|\s*Colors\s*\|(.*?)Add Gift/i', $flat, $m)) {
-            foreach (explode('|', $m[1]) as $c) {
-                $c = trim($c);
-                if ($c !== '' && strlen($c) <= 24 && ! preg_match('/\d{3}|Rs/i', $c)) {
-                    $colors[] = $c;
+        foreach ((array) ($d['product_config']['dataPrices'] ?? []) as $colorKey => $groups) {
+            $entry = $groups[0][0] ?? null;
+            if (! $entry) {
+                continue;
+            }
+            $files = (array) ($d['product_color_images'][$colorKey]['large'] ?? []);
+            $saved = [];
+            foreach (array_slice($files, 0, self::MAX_IMAGES_PER_COLOR) as $n => $file) {
+                $saved[] = $this->download(self::IMAGE_BASE.$file, "$slug-".Str::slug($colorKey)."-$n.webp");
+            }
+            $colors[] = [
+                'name' => $colorKey === '0' || $colorKey === '' ? null : Str::title(str_replace(['-', '_'], ' ', $colorKey)),
+                'price' => (int) preg_replace('/\D/', '', (string) ($entry['product_price'] ?? $it['price'])) ?: $it['price'],
+                'available' => ($entry['product_availability'] ?? '') !== 'Out Of Stock' && (int) ($entry['stock_qty'] ?? 1) > 0,
+                'images' => array_values(array_filter($saved)),
+            ];
+        }
+        if ($colors === []) {
+            $colors[] = ['name' => null, 'price' => $it['price'], 'available' => true, 'images' => []];
+        }
+
+        // Fallback main image from the listing when no colour gallery could be downloaded.
+        $fallback = null;
+        if (! array_filter(array_column($colors, 'images')) && $it['image']) {
+            foreach (['', '-500x500', '-270x270'] as $suffix) {
+                $fallback = $this->download(preg_replace('/\.webp$/', $suffix.'.webp', $it['image']), "$slug.webp");
+                if ($fallback) {
+                    break;
                 }
             }
         }
 
-        return ['brand' => $brand ? html_entity_decode($brand) : null, 'colors' => array_values(array_unique($colors)), 'source_name' => $url];
+        // ---- reviews shown on the source product page (public)
+        $reviews = [];
+        foreach (array_slice((array) ($d['ratings_data']['data'] ?? []), 0, 5) as $rv) {
+            $text = trim((string) ($rv['description'] ?? ''));
+            if ($text === '' || empty($rv['rating'])) {
+                continue;
+            }
+            $reviews[] = ['name' => trim((string) ($rv['fullname'] ?? '')), 'rating' => (int) $rv['rating'], 'text' => $text, 'date' => substr((string) ($rv['date_create'] ?? ''), 0, 10)];
+        }
+
+        return [
+            'name' => $it['name'], 'category' => $it['category'], 'page' => $it['page'], 'price' => $it['price'],
+            'brand' => html_entity_decode((string) ($d['brand'] ?? $data['brand_name'] ?? '')) ?: null,
+            'specs' => $specs, 'colors' => $colors, 'fallback_image' => $fallback,
+            'source_rating' => ['average' => (float) ($d['average_rating'] ?? 0), 'count' => (int) ($d['total_ratings'] ?? 0)],
+            'reviews' => $reviews,
+        ];
+    }
+
+    /** Download only genuine WebP photos (the site serves an SVG "no image" placeholder for some files). */
+    private function download(string $url, string $file): ?string
+    {
+        if ($this->option('no-images')) {
+            return null;
+        }
+        $path = database_path("seed-assets/images/$file");
+        if (File::exists($path)) {
+            return $file;
+        }
+        $r = Http::withUserAgent(self::UA)->timeout(40)->get($url);
+        $b = $r->body();
+        if ($r->ok() && strlen($b) > 1000 && str_starts_with($b, 'RIFF') && substr($b, 8, 4) === 'WEBP') {
+            File::put($path, $b);
+
+            return $file;
+        }
+
+        return null;
+    }
+
+    /** Parses `window.product_data = {...};` embedded in the product page. */
+    private function state(string $html): ?array
+    {
+        $p = strpos($html, 'window.product_data = ');
+        if ($p === false) {
+            return null;
+        }
+        $p += 22;
+        $depth = 0;
+        $in = false;
+        $esc = false;
+        $end = null;
+        $n = strlen($html);
+        for ($i = $p; $i < $n; $i++) {
+            $ch = $html[$i];
+            if ($in) {
+                if ($esc) {
+                    $esc = false;
+                } elseif ($ch === chr(92)) {
+                    $esc = true;
+                } elseif ($ch === chr(34)) {
+                    $in = false;
+                }
+
+                continue;
+            }
+            if ($ch === chr(34)) {
+                $in = true;
+            } elseif ($ch === '{') {
+                $depth++;
+            } elseif ($ch === '}' && --$depth === 0) {
+                $end = $i;
+                break;
+            }
+        }
+
+        return $end ? json_decode(substr($html, $p, $end - $p + 1), true, 512, JSON_INVALID_UTF8_SUBSTITUTE) : null;
     }
 }

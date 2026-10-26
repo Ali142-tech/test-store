@@ -93,8 +93,7 @@ class ShopController extends Controller
         ]);
 
         $query->active()
-            ->with(['defaultVariant', 'images', 'brand'])
-            ->withAvg('reviews', 'rating')->withCount('reviews');
+            ->forCards();
 
         if ($q = $data['q'] ?? null) {
             $like = '%'.addcslashes($q, '%_\\').'%';
@@ -132,6 +131,9 @@ class ShopController extends Controller
         if (! empty($data['on_sale'])) {
             $query->whereHas('variants', fn ($x) => $this->onSale($x));
         }
+
+        // Available products always come before sold-out ones, whatever the sort.
+        $query->orderByRaw('(select count(*) from product_variants pv where pv.product_id = products.id and pv.is_active = 1 and pv.deleted_at is null and pv.stock_quantity - pv.reserved_quantity > 0) > 0 desc');
 
         match ($data['sort'] ?? 'relevance') {
             'newest' => $query->orderByDesc('published_at'),

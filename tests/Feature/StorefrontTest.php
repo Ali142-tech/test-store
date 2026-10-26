@@ -9,7 +9,7 @@ use Database\Seeders\ContentSeeder;
 use Database\Seeders\RolesSeeder;
 
 beforeEach(function () {
-    $this->seed([RolesSeeder::class, ContentSeeder::class, CatalogSeeder::class]);
+    $this->seed([RolesSeeder::class, ContentSeeder::class, DatabaseSeedersPolicyPagesSeeder::class, CatalogSeeder::class]);
 });
 
 it('renders the main storefront pages', function (string $uri) {

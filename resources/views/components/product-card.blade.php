@@ -3,7 +3,7 @@
     use App\Support\Money;
     $v = $product->defaultVariant;
     $img = $product->primaryImageUrl();
-    $available = $v?->available() ?? 0;
+    $available = $product->relationLoaded('variants') && $product->variants->isNotEmpty() ? $product->variants->sum(fn ($x) => $x->available()) : ($v?->available() ?? 0);
     $onSale = $v?->onSale();
 @endphp
 <article class="card-lift group relative rounded-3xl bg-white p-2 ring-1 ring-line">
@@ -25,6 +25,13 @@
             <h3 class="mt-1 line-clamp-2 min-h-[2.5rem] text-sm font-medium leading-snug">{{ $product->name }}</h3>
             @if (($product->reviews_count ?? 0) > 0)
                 <p class="mt-1 text-xs text-ink-soft"><span class="text-amber-500">★</span> {{ number_format($product->reviews_avg_rating, 1) }} ({{ $product->reviews_count }})</p>
+            @endif
+            @php $colors = $product->colorOptions(); @endphp
+            @if ($colors->count() > 1)
+                <div class="mt-2 flex items-center gap-1" aria-label="{{ $colors->count() }} colours">
+                    @foreach ($colors->take(5) as $c)<span title="{{ $c }}" class="h-3.5 w-3.5 rounded-full ring-1 ring-black/15" style="background: {{ \App\Support\ColorMap::css($c) ?? '#e5e7eb' }}"></span>@endforeach
+                    @if ($colors->count() > 5)<span class="text-xs text-ink-soft">+{{ $colors->count() - 5 }}</span>@endif
+                </div>
             @endif
             @if ($v)
                 <p class="mt-2 flex items-baseline gap-2">

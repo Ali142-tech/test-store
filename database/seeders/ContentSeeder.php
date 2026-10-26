@@ -7,20 +7,12 @@ use App\Models\Page;
 use App\Models\StoreSetting;
 use Illuminate\Database\Seeder;
 
-/** Placeholder policy copy. Must be reviewed by the owner / legal counsel before launch. */
+/** Store settings, FAQs and default delivery. Review every value in Admin > Store settings. */
 class ContentSeeder extends Seeder
 {
     public function run(): void
     {
-        $notice = '<p><strong>Placeholder text.</strong> Replace this with your real policy before launch.</p>';
-        $pages = [
-            'about' => 'About us', 'shipping-policy' => 'Shipping policy', 'returns-and-refunds' => 'Returns & refunds policy',
-            'privacy-policy' => 'Privacy policy', 'terms-and-conditions' => 'Terms & conditions', 'warranty-policy' => 'Warranty policy',
-        ];
-        foreach ($pages as $slug => $title) {
-            Page::firstOrCreate(['slug' => $slug], ['title' => $title, 'body' => $notice]);
-        }
-
+        // Policy pages (about, shipping, returns, privacy, terms, warranty) are seeded by PolicyPagesSeeder.
         $faqs = [
             ['Do you offer wholesale pricing?', 'Yes. Register a wholesale account; once approved you will see tiered bulk pricing and can request quotes.'],
             ['Which payment methods do you accept?', 'Cash on delivery and bank transfer. Other methods will be listed once enabled.'],

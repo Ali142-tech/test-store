@@ -28,11 +28,12 @@
 <script>
 function productPage(variants, symbol) {
     return {
-        variants, selected: 0, qty: 1,
+        variants, selected: 0, qty: 1, img: 0,
+        get gallery() { return this.v ? this.v.images : []; },
         get v() { return this.variants[this.selected]; },
         get minQty() { return this.v ? this.v.moq : 1; },
-        init() { this.qty = this.minQty; },
-        pick(i) { this.selected = i; this.qty = Math.min(Math.max(this.qty, this.minQty), Math.max(this.v.available, 1)); },
+        init() { const first = this.variants.findIndex(x => x.available > 0); if (first > 0) this.selected = first; this.qty = this.minQty; },
+        pick(i) { this.selected = i; this.img = 0; this.qty = Math.min(Math.max(this.qty, this.minQty), Math.max(this.v.available, 1)); },
         money(n) { return symbol + ' ' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); },
     };
 }
@@ -57,22 +58,14 @@ function productPage(variants, symbol) {
     </nav>
 
     <div class="mt-6 grid gap-10 lg:grid-cols-2">
-        <div x-data="{ i: 0 }">
-            @php $imgs = $product->images; @endphp
-            <div class="aspect-square overflow-hidden rounded-[var(--radius-card)] bg-mist">
-                @forelse ($imgs as $k => $img)
-                    <img x-show="i === {{ $k }}" src="{{ $img->url() }}" alt="{{ $img->alt ?: $product->name }}" class="h-full w-full object-cover">
-                @empty
-                    <div class="flex h-full items-center justify-center bg-gradient-to-br from-accent-soft to-mist text-7xl font-semibold text-accent/50" aria-hidden="true">{{ mb_substr($product->name, 0, 1) }}</div>
-                @endforelse
+        <div>
+            <div class="relative aspect-square overflow-hidden rounded-[var(--radius-card)] bg-mist ring-1 ring-line">
+                <template x-if="gallery.length"><img :src="gallery[img].url" :alt="gallery[img].alt" class="h-full w-full object-contain p-2"></template>
+                <template x-if="!gallery.length"><div class="flex h-full items-center justify-center bg-gradient-to-br from-accent-soft to-mist text-7xl font-semibold text-accent/50" aria-hidden="true">{{ mb_substr($product->name, 0, 1) }}</div></template>
             </div>
-            @if ($imgs->count() > 1)
-                <div class="mt-3 flex gap-2">
-                    @foreach ($imgs as $k => $img)
-                        <button @click="i = {{ $k }}" class="h-16 w-16 overflow-hidden rounded-xl border" :class="i === {{ $k }} ? 'border-accent' : 'border-line'"><img src="{{ $img->url() }}" alt="" class="h-full w-full object-cover" loading="lazy"></button>
-                    @endforeach
-                </div>
-            @endif
+            <div class="mt-3 flex gap-2 overflow-x-auto" x-show="gallery.length > 1">
+                <template x-for="(g, k) in gallery" :key="g.url"><button type="button" @click="img = k" class="h-16 w-16 shrink-0 overflow-hidden rounded-xl border bg-mist" :class="img === k ? 'border-accent' : 'border-line'"><img :src="g.url" alt="" class="h-full w-full object-contain" loading="lazy"></button></template>
+            </div>
         </div>
 
         <div>
@@ -92,10 +85,10 @@ function productPage(variants, symbol) {
 
             @if ($variants->count() > 1)
                 <fieldset class="mt-6">
-                    <legend class="text-sm font-semibold">Option</legend>
+                    <legend class="text-sm font-semibold">{{ $variants->contains(fn ($v) => $v['color']) ? 'Colour' : 'Option' }}: <span class="font-normal text-ink-soft" x-text="v.name"></span></legend>
                     <div class="mt-2 flex flex-wrap gap-2">
                         <template x-for="(vr, idx) in variants" :key="vr.id">
-                            <button type="button" @click="pick(idx)" class="chip" :class="selected === idx ? '!border-accent bg-accent-soft' : ''" :disabled="vr.available === 0" x-text="vr.name"></button>
+                            <button type="button" @click="pick(idx)" class="chip gap-2 disabled:opacity-40" :class="selected === idx ? '!border-accent bg-accent-soft' : ''" :disabled="vr.available === 0"><span x-show="vr.swatch" class="h-4 w-4 rounded-full ring-1 ring-black/15" :style="{ background: vr.swatch }"></span><span x-text="vr.name"></span><span x-show="vr.available === 0" class="text-xs text-ink-soft">(sold out)</span></button>
                         </template>
                     </div>
                 </fieldset>
@@ -177,6 +170,21 @@ function productPage(variants, symbol) {
             <p class="mt-3 text-sm text-ink-soft">No reviews yet.</p>
         @endforelse
     </section>
+
+    @if ($externalReviews->isNotEmpty())
+        <section class="mt-10 rounded-3xl bg-mist p-6">
+            <h2 class="text-lg font-semibold">Reviews from other Pakistani stores</h2>
+            <p class="mt-1 text-xs text-ink-soft">These are public reviews of this product on {{ $externalReviews->first()->source }}, shown for reference. They are not reviews of orders placed with us and are not included in our rating.</p>
+            <div class="mt-4 grid gap-4 md:grid-cols-2">
+                @foreach ($externalReviews as $er)
+                    <figure class="rounded-2xl bg-white p-4"><p class="text-amber-500">{{ str_repeat('★', $er->rating) }}<span class="text-ink-soft/30">{{ str_repeat('★', 5 - $er->rating) }}</span></p>
+                        <blockquote class="mt-1 text-sm" dir="auto">{{ $er->body }}</blockquote>
+                        <figcaption class="mt-2 text-xs text-ink-soft">{{ $er->displayName() }}@if ($er->reviewed_on) · {{ $er->reviewed_on->format('d M Y') }}@endif · via {{ $er->source }}</figcaption></figure>
+                @endforeach
+            </div>
+            @if ($externalReviews->first()->source_url)<p class="mt-3 text-xs"><a class="underline" rel="nofollow noopener" target="_blank" href="{{ $externalReviews->first()->source_url }}">See all reviews at the source</a></p>@endif
+        </section>
+    @endif
 
     @if ($recent->isNotEmpty())
         <section class="mt-14">
