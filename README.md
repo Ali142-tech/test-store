@@ -1,6 +1,6 @@
-# Voltix: mobile accessories store (retail + wholesale)
+# DigiPower LLC: gaming gear store (retail + wholesale)
 
-Laravel 12 monolith: Blade + Tailwind 4 + Alpine storefront, Filament 4 admin at `/admin`, MySQL, Pest tests. "Voltix" is a placeholder brand name (Admin > Store settings).
+Laravel 12 monolith: Blade + Tailwind 4 + Alpine storefront, Filament 4 admin at `/admin`, MySQL, Pest tests. "DigiPower LLC" is the store name (Admin > Store settings).
 
 ## Run locally
 ```bash
