@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\StoreSetting;
+use App\Support\Region;
 use BackedEnum;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -49,6 +50,11 @@ class StoreSettings extends Page implements HasSchemas
         foreach (self::BOOLEANS as $b) {
             $values[$b] = (bool) ($values[$b] ?? false);
         }
+        // show the rates actually in use (defaults until the owner sets their own)
+        foreach (['USD', 'GBP', 'EUR'] as $c) {
+            $values['rate_'.strtolower($c)] = Region::rate($c);
+        }
+        $values['extra_usd'] = is_numeric($values['extra_usd']) ? $values['extra_usd'] : Region::DEFAULT_EXTRA_USD;
         $this->form->fill($values);
     }
 
@@ -59,10 +65,10 @@ class StoreSettings extends Page implements HasSchemas
                 TextInput::make('store_name')->required(), TextInput::make('announcement')->helperText('Shown in the bar at the top of every page.'),
                 TextInput::make('contact_email')->email(), TextInput::make('contact_phone'), TextInput::make('whatsapp_number')->helperText('International format, digits only, e.g. 923027171164'),
                 TextInput::make('currency')->required()->length(3)->helperText('ISO code, e.g. PKR'), TextInput::make('currency_symbol')->required(),
-                TextInput::make('rate_usd')->label('PKR per 1 USD (USA / Canada)')->numeric()->minValue(1),
-                TextInput::make('rate_gbp')->label('PKR per 1 GBP (United Kingdom)')->numeric()->minValue(1),
-                TextInput::make('rate_eur')->label('PKR per 1 EUR (Eurozone)')->numeric()->minValue(1),
-                TextInput::make('extra_usd')->label('Extra fee per unit for USD/GBP/EUR customers (in US$)')->numeric()->minValue(0)->helperText('Added to every product price for visitors in the USA, Canada, UK and Eurozone. Set 0 to turn off.'),
+                TextInput::make('rate_usd')->label('PKR per 1 USD (USA / Canada)')->numeric()->minValue(1)->required()->default(280),
+                TextInput::make('rate_gbp')->label('PKR per 1 GBP (United Kingdom)')->numeric()->minValue(1)->required()->default(370),
+                TextInput::make('rate_eur')->label('PKR per 1 EUR (Eurozone)')->numeric()->minValue(1)->required()->default(325),
+                TextInput::make('extra_usd')->label('Extra fee per unit for USD/GBP/EUR customers (in US$)')->numeric()->minValue(0)->required()->default(30)->helperText('Added to every product price for visitors in the USA, Canada, UK and Eurozone. Set 0 to turn off.'),
                 TextInput::make('tax_rate')->numeric()->minValue(0)->maxValue(100)->suffix('%')->helperText('Added on top of goods after discounts. 0 = no tax.'),
                 Toggle::make('guest_checkout')->label('Allow guest checkout'),
             ]),

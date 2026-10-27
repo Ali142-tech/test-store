@@ -82,3 +82,16 @@ it('does not touch prices for Pakistani orders', function () {
 it('exposes the fee only through Region for international visitors', function () {
     expect(Region::extraPkr())->toBe(0.0);
 });
+
+it('never shows PKR amounts with a dollar sign when the rate or fee settings are blank', function () {
+    foreach (['rate_usd', 'rate_gbp', 'rate_eur', 'extra_usd'] as $k) {
+        StoreSetting::updateOrCreate(['key' => $k], ['value' => '']);
+    }
+    // blank settings fall back to the defaults (280 and a $30 fee): 32000 / 280 + 30 = 144.29
+    $this->withHeaders(from('US'))->get('/shop')->assertSee('$144.29')->assertDontSee('$32,000');
+    foreach (['rate_usd', 'extra_usd'] as $k) {
+        StoreSetting::updateOrCreate(['key' => $k], ['value' => '0']);
+    }
+    // a zero rate is also invalid; a zero fee is a deliberate "no fee": 32000 / 280 = 114.29
+    $this->withHeaders(from('US'))->get('/shop')->assertSee('$114.29');
+});

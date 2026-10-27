@@ -19,6 +19,11 @@ class Region
 {
     public const SYMBOLS = ['PKR' => 'Rs', 'USD' => '$', 'GBP' => '£', 'EUR' => '€'];
 
+    /** PKR per 1 unit; only used until the owner enters real rates in Admin > Store settings. */
+    public const DEFAULT_RATES = ['USD' => 280.0, 'GBP' => 370.0, 'EUR' => 325.0];
+
+    public const DEFAULT_EXTRA_USD = 30.0;
+
     private const USD = ['US', 'CA'];
 
     private const GBP = ['GB'];
@@ -50,10 +55,14 @@ class Region
     public static function rate(?string $currency = null): float
     {
         $currency ??= self::currency();
-        $default = ['USD' => 280.0, 'GBP' => 370.0, 'EUR' => 325.0];
-        $rate = (float) StoreSetting::get('rate_'.strtolower($currency), $default[$currency] ?? 1);
+        if ($currency === 'PKR') {
+            return 1.0;
+        }
 
-        return $currency === 'PKR' || $rate <= 0 ? 1.0 : $rate;
+        // A blank / zero / non-numeric setting must never mean "1 PKR = 1 dollar": fall back to the default rate.
+        $rate = (float) StoreSetting::get('rate_'.strtolower($currency));
+
+        return $rate > 0 ? $rate : self::DEFAULT_RATES[$currency];
     }
 
     /** The per-unit international fee expressed in PKR (0 for Pakistan/other regions). */
@@ -63,7 +72,10 @@ class Region
             return 0.0;
         }
 
-        return round((float) StoreSetting::get('extra_usd', 30) * self::rate('USD'), 2);
+        $extra = StoreSetting::get('extra_usd');
+        $extra = is_numeric($extra) ? (float) $extra : self::DEFAULT_EXTRA_USD; // blank = default; 0 = fee switched off
+
+        return round(max(0.0, $extra) * self::rate('USD'), 2);
     }
 
     /** Amount in PKR to the visitor's currency, as a number. */
