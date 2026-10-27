@@ -22,40 +22,45 @@ class SampleReviewsSeeder extends Seeder
 
     /** category => [[rating, title, body], ...] : generic, product-type specific, no delivery/shop claims. */
     private const POOL = [
-        'Power Banks' => [
-            [5, 'Charges my phone several times', 'Holds a lot of charge and tops up my phone quickly. Easy to carry in a bag.'],
-            [4, 'Good for travel', 'Does the job on trips. A little heavy but the capacity makes up for it.'],
-            [5, 'Does what it says', 'Charged two devices at once without getting very hot. Happy with it.'],
-            [3, 'Okay', 'Works fine, but I wish the indicator lights were clearer.'],
+        'Game Consoles' => [
+            [5, 'Smooth and fast', 'Loads games quickly and runs quietly. Setup took only a few minutes.'],
+            [4, 'Great for the family', 'Plenty of storage and the graphics look excellent on a good TV.'],
+            [5, 'Worth the upgrade', 'Noticeably better performance than my old console. Very happy.'],
+            [3, 'Good, a bit pricey', 'Performs well, though I wish it came with a second controller.'],
         ],
-        'Chargers & Adapters' => [
-            [5, 'Fast and compact', 'Charges noticeably faster than my old adapter and it stays cool.'],
-            [4, 'Solid charger', 'Fits well in the socket and charges my phone quickly. Good value.'],
-            [5, 'Works great', 'Plug in and go. Fast charging works as expected with my phone.'],
-            [3, 'Fine for the price', 'Charges well, though the body feels a bit light.'],
+        'Controllers & Gamepads' => [
+            [5, 'Comfortable grip', 'Sticks and triggers feel precise and the battery lasts through long sessions.'],
+            [4, 'Solid build', 'Connects instantly and the buttons feel responsive.'],
+            [5, 'Great in competitive games', 'Low latency and a good layout. Easy to pair.'],
+            [3, 'Decent', 'Works well; the d-pad could be a little firmer.'],
         ],
-        'Cables' => [
-            [5, 'Sturdy cable', 'Feels well made and charges at a good speed. No problems so far.'],
-            [4, 'Good length', 'Nice length for the bedside. Connectors fit snugly.'],
-            [5, 'Value for money', 'Does everything I need for the price. Would buy again.'],
-            [3, 'Decent', 'Works well. Time will tell how it holds up.'],
+        'Gaming Keyboards' => [
+            [5, 'Satisfying to type on', 'Great key feel and the RGB looks sharp. Good for both gaming and work.'],
+            [4, 'Fast and responsive', 'Keys register instantly and the build is sturdy.'],
+            [5, 'Excellent value', 'Hot-swappable and well built. Better than I expected.'],
+            [3, 'Good but loud', 'Typing feels great, though the switches are on the louder side.'],
         ],
-        'Earbuds & Headphones' => [
-            [5, 'Clear sound', 'Good bass and clear calls. Pairing with my phone was instant.'],
-            [4, 'Comfortable fit', 'Sit comfortably for long listening and the battery lasts well.'],
-            [5, 'Great for the price', 'Sound is better than I expected at this price. Case is neat too.'],
-            [3, 'Average', 'Sound is okay. Microphone could be better in noisy places.'],
+        'Gaming Mice' => [
+            [5, 'Light and precise', 'Tracks perfectly and the shape fits my hand well.'],
+            [4, 'Great sensor', 'Wireless connection is stable and the battery lasts a long time.'],
+            [5, 'Perfect for FPS', 'Very light with accurate clicks. Highly recommended.'],
+            [3, 'Fine', 'Works well, software could be simpler.'],
         ],
-        'Wireless Chargers' => [
-            [5, 'Convenient', 'Just place the phone and it starts charging. Great for my desk.'],
-            [4, 'Reliable', 'Charges steadily and does not get too warm. Looks neat.'],
-            [4, 'Handy on the bedside', 'Easy to use and tidy. Charging is slower than a cable, as expected.'],
+        'Gaming Headsets & Headphones' => [
+            [5, 'Immersive sound', 'Clear highs, strong bass and a comfortable fit for long sessions.'],
+            [4, 'Comfortable and clear', 'The microphone is clear and noise cancelling works well.'],
+            [5, 'Excellent quality', 'Sound is excellent for both games and music.'],
+            [3, 'Good overall', 'Sound is great, though the earcups get warm after a few hours.'],
         ],
-        'Car Accessories' => [
-            [5, 'Handy in the car', 'Fits the socket firmly and charges my phone fast on the road.'],
-            [4, 'Works well', 'Charges two devices at once during trips. Solid build.'],
-            [5, 'Good buy', 'Compact and does the job. Happy with it.'],
-            [3, 'Fine', 'Works as described. Wish it had an indicator light.'],
+        'Gaming Chairs' => [
+            [5, 'Very comfortable', 'Good back support and easy to adjust. Great for long sessions.'],
+            [4, 'Sturdy build', 'Assembly took a while but the chair feels solid.'],
+            [4, 'Looks great', 'Comfortable cushioning and smooth reclining.'],
+        ],
+        'VR Headsets' => [
+            [5, 'Amazing experience', 'Sharp visuals and comfortable to wear. Setup was straightforward.'],
+            [4, 'Fun for the whole family', 'Great library of games and tracking works well.'],
+            [5, 'Impressive', 'Immersive and smooth. A real step up.'],
         ],
     ];
 
@@ -77,7 +82,7 @@ class SampleReviewsSeeder extends Seeder
             ->groupBy(fn ($p) => $p->category?->name)->map(fn ($g) => $g->values());
 
         foreach (self::POOL as $category => $pool) {
-            foreach (($products[$category] ?? collect())->take(14) as $n => $product) {
+            foreach (($products[$category] ?? collect())->take(12) as $n => $product) {
                 // 1-3 reviews per product, varied but deterministic.
                 foreach (range(0, $n % 3) as $k) {
                     [$rating, $title, $body] = $pool[($n + $k * 2) % count($pool)];

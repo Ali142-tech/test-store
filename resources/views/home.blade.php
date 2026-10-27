@@ -8,9 +8,9 @@
         <div>
             <span class="pill anim-up">● {{ $hero->subtitle ?? 'Retail & wholesale · Priced in PKR' }}</span>
             <h1 class="anim-up delay-1 mt-6 text-5xl font-bold leading-[1.02] tracking-tight sm:text-7xl">
-                {{ $hero->title ?? 'Power, sound & charging' }}<br><span class="text-gradient">for every phone.</span>
+                {{ $hero->title ?? 'Level up your setup' }}<br><span class="text-gradient">with premium gaming gear.</span>
             </h1>
-            <p class="anim-up delay-2 mt-6 max-w-lg text-lg text-ink-soft">Chargers, cables, power banks, earbuds and more from {{ $brands->take(4)->pluck('name')->implode(', ') }} and more. Buy one, or buy in bulk for your shop.</p>
+            <p class="anim-up delay-2 mt-6 max-w-lg text-lg text-ink-soft">Consoles, controllers, keyboards, headsets and more from {{ $brands->take(4)->pluck('name')->implode(', ') }} and more. Buy one, or buy in bulk for your gaming shop.</p>
             <div class="anim-up delay-3 mt-9 flex flex-wrap gap-3">
                 <a href="{{ $hero->cta_url ?? route('shop') }}" class="btn btn-primary !px-8 !py-4 text-base">{{ $hero->cta_label ?? 'Shop now' }} →</a>
                 <a href="{{ route('wholesale.register') }}" class="btn btn-ghost !px-8 !py-4 text-base">Wholesale pricing</a>
@@ -75,7 +75,7 @@
 {{-- ============ Shop by phone ============ --}}
 <section class="bg-deep section text-white">
     <div class="container-x">
-        <p class="eyebrow !text-white/60">Compatibility</p><h2 class="h-section mt-1">Find accessories for your phone</h2>
+        <p class="eyebrow !text-white/60">Platforms</p><h2 class="h-section mt-1">Shop by platform</h2>
         <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($deviceBrands as $b)
                 <div class="rounded-3xl bg-white/5 p-6 ring-1 ring-white/10">
@@ -96,7 +96,7 @@
         <ul class="mt-6 grid max-w-2xl gap-2 text-white/90 sm:grid-cols-2">
             <li>✓ Quantity-based price tiers</li><li>✓ Bulk order by SKU or CSV upload</li><li>✓ Request a custom quote</li><li>✓ Wholesale order history</li>
         </ul>
-        <div class="mt-8 flex flex-wrap gap-3"><a href="{{ route('wholesale.register') }}" class="btn bg-surface !px-7 !py-3.5 text-ink hover:bg-accent-soft">Apply for a wholesale account</a><a href="{{ route('contact') }}" class="btn border border-white/40 !px-7 !py-3.5 text-white hover:bg-white/10">Talk to sales</a></div>
+        <div class="mt-8 flex flex-wrap gap-3"><a href="{{ route('wholesale.register') }}" class="btn w-full bg-surface !px-7 !py-3.5 text-center text-ink hover:bg-accent-soft sm:w-auto">Apply for wholesale</a><a href="{{ route('contact') }}" class="btn w-full border border-white/40 !px-7 !py-3.5 text-center text-white hover:bg-white/10 sm:w-auto">Talk to sales</a></div>
     </div>
 </section>
 

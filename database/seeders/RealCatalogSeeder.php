@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
  * (database/seed-assets/catalog.json + images/): product names, brands, PKR prices per colour, the specifications
  * published for each product, per-colour photo galleries, and per-colour availability. Reviews from other sites are NOT imported.
  *
- * Source: PriceOye. Prices change often: re-run the scraper or edit in Admin > Products before selling.
+ * Source: Qeemat (market reference prices). Prices change often: re-run the scraper or edit in Admin > Products before selling.
 * Images belong to their owners: confirm you may use them on a live store (source_url is kept).
  *
  * Deliberately NOT invented: sale prices, our own ratings, sales counts, warranty/authenticity claims, wholesale
@@ -26,12 +26,20 @@ use Illuminate\Support\Str;
  */
 class RealCatalogSeeder extends Seeder
 {
-    private const OPENING_STOCK = 25;
+    private const OPENING_STOCK = 10;
 
     private const CATEGORY_ICONS = [
-        'Cases & Covers' => 'shield', 'Screen Protectors' => 'layers', 'Chargers & Adapters' => 'zap', 'Cables' => 'cable',
-        'Power Banks' => 'battery', 'Wireless Chargers' => 'wifi', 'Earbuds & Headphones' => 'headphones', 'Car Accessories' => 'car',
-        'Stands & Grips' => 'stand', 'Lens Protectors' => 'camera', 'Smartwatch Accessories' => 'watch', 'Bundles & Packs' => 'package',
+        'Game Consoles' => 'gamepad', 'Controllers & Gamepads' => 'gamepad', 'Gaming Keyboards' => 'keyboard', 'Gaming Mice' => 'mouse',
+        'Gaming Headsets & Headphones' => 'headphones', 'Gaming Monitors' => 'monitor', 'VR Headsets' => 'vr',
+    ];
+
+    /** platform group => models (used for "shop by platform" compatibility filters); matched by keyword in the product name. */
+    private const PLATFORMS = [
+        'PlayStation' => [['PlayStation 5', 'playstation|ps5|ps4|dualsense|dualshock'], ['PlayStation VR2', 'vr2']],
+        'Xbox' => [['Xbox Series X|S', 'xbox']],
+        'Nintendo' => [['Nintendo Switch', 'switch|nintendo']],
+        'PC & Handheld' => [['Windows PC', 'monitor|keyboard|mouse|gk[0-9]|superlight|razer|logitech|hyperx|steelseries|bloody|glorious|attack shark|skyloong|wireless gaming|xinput|usb'], ['Steam Deck', 'steam deck']],
+        'Meta Quest' => [['Meta Quest', 'quest']],
     ];
 
     public function run(): void
@@ -48,20 +56,11 @@ class RealCatalogSeeder extends Seeder
             $cats[$name] = Category::firstOrCreate(['slug' => Str::slug($name)], ['name' => $name, 'icon' => self::CATEGORY_ICONS[$name], 'sort_order' => $i]);
         }
 
-        // Real phone models used for compatibility filters (USB-C except the iPhone 14 generation).
-        $devices = [
-            'Apple iPhone' => [['iPhone 16 Pro Max', 'usbc'], ['iPhone 16 Pro', 'usbc'], ['iPhone 16', 'usbc'], ['iPhone 15', 'usbc'], ['iPhone 14', 'lightning']],
-            'Samsung Galaxy' => [['Galaxy S25 Ultra', 'usbc'], ['Galaxy S25', 'usbc'], ['Galaxy S24', 'usbc'], ['Galaxy A55', 'usbc']],
-            'Google Pixel' => [['Pixel 9 Pro', 'usbc'], ['Pixel 9', 'usbc'], ['Pixel 8a', 'usbc']],
-            'Xiaomi & Redmi' => [['Xiaomi 14', 'usbc'], ['Redmi Note 13 Pro', 'usbc']],
-            'Oppo & Vivo' => [['Oppo Reno 12', 'usbc'], ['Vivo V40', 'usbc']],
-            'OnePlus' => [['OnePlus 12', 'usbc'], ['OnePlus Nord 4', 'usbc']],
-        ];
-        $byPort = ['usbc' => collect(), 'lightning' => collect()];
-        foreach ($devices as $brand => $models) {
+        $platforms = [];
+        foreach (self::PLATFORMS as $brand => $models) {
             $db = DeviceBrand::firstOrCreate(['slug' => Str::slug($brand)], ['name' => $brand]);
-            foreach ($models as [$m, $port]) {
-                $byPort[$port]->push(DeviceModel::firstOrCreate(['device_brand_id' => $db->id, 'slug' => Str::slug($m)], ['name' => $m])->id);
+            foreach ($models as [$m, $pattern]) {
+                $platforms[] = [DeviceModel::firstOrCreate(['device_brand_id' => $db->id, 'slug' => Str::slug($m)], ['name' => $m])->id, $pattern];
             }
         }
 
@@ -84,7 +83,7 @@ class RealCatalogSeeder extends Seeder
                 'status' => 'active', 'manufacturer' => $brandName, 'short_description' => $this->summary($row, $brandName),
                 'description' => $this->description($row, $brandName, $colors),
                 'specifications' => $specs ?: null,
-                'compatibility_note' => $this->portNote($row),
+                'compatibility_note' => null,
                 'wholesale_enabled' => true, 'published_at' => now(),
             ]);
 
@@ -113,8 +112,9 @@ class RealCatalogSeeder extends Seeder
                 $this->attach($product, null, $row['fallback_image'], $row['name'], $row['page'], $disk, $order++);
             }
 
-            if ($port = $this->port($row)) {
-                $product->deviceModels()->syncWithoutDetaching($byPort[$port]->all());
+            $ids = collect($platforms)->filter(fn ($p) => preg_match('/'.$p[1].'/i', $row['name']))->pluck(0)->all();
+            if ($ids) {
+                $product->deviceModels()->syncWithoutDetaching($ids);
             }
 
         }
@@ -132,7 +132,7 @@ class RealCatalogSeeder extends Seeder
 
     private function summary(array $row, ?string $brand): string
     {
-        $bits = array_filter([$brand, $row['specs']['Battery · Capacity'] ?? null, $row['specs']['Power · Output'] ?? null]);
+        $bits = array_filter([$brand, $row['specs']['General Information · Model'] ?? null]);
 
         return $row['name'].($bits ? ' ('.implode(' · ', $bits).')' : '');
     }
@@ -163,29 +163,5 @@ class RealCatalogSeeder extends Seeder
 
         // "URPIN" -> "Urpin"; short acronyms (QCY, LDNIO, WIWU) stay upper-case.
         return (strtoupper($raw) === $raw && strlen($raw) > 4) ? Str::title(strtolower($raw)) : $raw;
-    }
-
-    /** Port only when the listing itself says so (no guessing). */
-    private function port(array $row): ?string
-    {
-        if (! in_array($row['category'], ['Cables', 'Chargers & Adapters'], true)) {
-            return null;
-        }
-        $n = strtolower($row['name']);
-
-        return match (true) {
-            str_contains($n, 'lightning') => 'lightning',
-            (bool) preg_match('/type-?c|usb-?c|c to c|c2c/', $n) => 'usbc',
-            default => null,
-        };
-    }
-
-    private function portNote(array $row): ?string
-    {
-        return match ($this->port($row)) {
-            'usbc' => 'Listing mentions USB-C / Type-C.',
-            'lightning' => 'Listing mentions Lightning.',
-            default => null,
-        };
     }
 }

@@ -33,7 +33,7 @@ class StoreSettings extends Page implements HasSchemas
     private const BOOLEANS = ['guest_checkout', 'payment_cod_enabled', 'payment_cod_wholesale', 'payment_bank_enabled'];
 
     private const KEYS = [
-        'store_name', 'announcement', 'contact_email', 'contact_phone', 'currency', 'currency_symbol', 'tax_rate', 'guest_checkout',
+        'store_name', 'announcement', 'contact_email', 'contact_phone', 'whatsapp_number', 'currency', 'currency_symbol', 'tax_rate', 'guest_checkout',
         'wholesale_min_order_value', 'payment_cod_enabled', 'payment_cod_wholesale', 'payment_bank_enabled',
         'bank_name', 'bank_account_title', 'bank_account_number', 'bank_instructions',
     ];
@@ -57,7 +57,7 @@ class StoreSettings extends Page implements HasSchemas
         return $schema->statePath('data')->components([
             Section::make('Store')->columns(2)->schema([
                 TextInput::make('store_name')->required(), TextInput::make('announcement')->helperText('Shown in the bar at the top of every page.'),
-                TextInput::make('contact_email')->email(), TextInput::make('contact_phone'),
+                TextInput::make('contact_email')->email(), TextInput::make('contact_phone'), TextInput::make('whatsapp_number')->helperText('International format, digits only, e.g. 923027171164'),
                 TextInput::make('currency')->required()->length(3)->helperText('ISO code, e.g. PKR'), TextInput::make('currency_symbol')->required(),
                 TextInput::make('tax_rate')->numeric()->minValue(0)->maxValue(100)->suffix('%')->helperText('Added on top of goods after discounts. 0 = no tax.'),
                 Toggle::make('guest_checkout')->label('Allow guest checkout'),

@@ -121,13 +121,13 @@ function productPage(variants, symbol) {
             <form method="post" action="{{ route('cart.add') }}" class="mt-6 flex flex-wrap items-center gap-3">
                 @csrf
                 <input type="hidden" name="variant_id" :value="v.id">
-                <div class="flex items-center rounded-full border border-line">
+                <div class="flex w-full items-center justify-between rounded-full border border-line sm:w-auto sm:justify-start">
                     <button type="button" class="h-11 w-11" @click="qty = Math.max(minQty, q - 1)" aria-label="Decrease">−</button>
                     <input type="number" name="quantity" x-model.number="qty" @change="clamp()" @blur="clamp()" :min="minQty" :max="v.available" class="w-14 border-0 bg-transparent text-center focus:outline-none" aria-label="Quantity">
                     <button type="button" class="h-11 w-11" @click="qty = Math.min(v.available, q + 1)" aria-label="Increase">+</button>
                 </div>
-                <button class="btn btn-primary flex-1 disabled:opacity-40" :disabled="v.available === 0">Add to cart</button>
-                <button class="btn btn-accent disabled:opacity-40" name="buy_now" value="1" :disabled="v.available === 0">Buy now</button>
+                <button class="btn btn-primary min-w-[8.5rem] flex-1 whitespace-nowrap disabled:opacity-40" :disabled="v.available === 0">Add to cart</button>
+                <button class="btn btn-accent min-w-[8.5rem] flex-1 whitespace-nowrap disabled:opacity-40 sm:flex-none" name="buy_now" value="1" :disabled="v.available === 0">Buy now</button>
             </form>
             @auth
                 <form method="post" action="{{ route('account.wishlist.toggle', $product) }}" class="mt-3">@csrf
@@ -139,7 +139,7 @@ function productPage(variants, symbol) {
                 @if ($product->warranty) <div class="flex justify-between py-3"><dt class="text-ink-soft">Warranty</dt><dd>{{ $product->warranty }}</dd></div> @endif
                 @if ($product->manufacturer) <div class="flex justify-between py-3"><dt class="text-ink-soft">Manufacturer</dt><dd>{{ $product->manufacturer }}</dd></div> @endif
                 @if ($product->is_authentic_verified && $product->authenticity_note) <div class="flex justify-between py-3"><dt class="text-ink-soft">Authenticity</dt><dd>{{ $product->authenticity_note }}</dd></div> @endif
-                <div class="flex justify-between py-3"><dt class="text-ink-soft">SKU</dt><dd x-text="v.sku"></dd></div>
+                <div class="flex justify-between gap-4 py-3"><dt class="shrink-0 text-ink-soft">SKU</dt><dd class="min-w-0 break-all text-right" x-text="v.sku"></dd></div>
             </dl>
         </div>
     </div>

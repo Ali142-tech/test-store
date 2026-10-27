@@ -10,8 +10,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ isset($metaTitle) ? $metaTitle.' | '.$storeName : $storeName.' - Mobile accessories, retail & wholesale' }}</title>
-    <meta name="description" content="{{ $metaDescription ?? 'Phone cases, chargers, cables, power banks and more for every major phone brand. Retail and wholesale.' }}">
+    <title>{{ isset($metaTitle) ? $metaTitle.' | '.$storeName : $storeName.' - Premium gaming gear, retail & wholesale' }}</title>
+    <meta name="description" content="{{ $metaDescription ?? 'Consoles, controllers, gaming keyboards, mice, headsets and monitors. Retail and wholesale.' }}">
     <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
     @if (request()->routeIs('cart.*', 'checkout.*', 'order.*', 'account.*', 'wholesale.*', 'quotes.*', 'login', 'register', 'search')) <meta name="robots" content="noindex,follow"> @endif
     <meta property="og:title" content="{{ $metaTitle ?? $storeName }}">
@@ -72,7 +72,7 @@
 
             <form action="{{ route('search') }}" method="get" class="ml-auto hidden max-w-md flex-1 md:block" role="search">
                 <label class="sr-only" for="q">Search</label>
-                <input id="q" name="q" value="{{ request('q') }}" type="search" placeholder="Search products, SKU or phone model"
+                <input id="q" name="q" value="{{ request('q') }}" type="search" placeholder="Search consoles, keyboards, headsets or SKU"
                        class="field !rounded-full !py-2.5 bg-mist border-transparent">
             </form>
 
@@ -101,7 +101,7 @@
     <div x-cloak x-show="search" x-transition class="border-b border-line bg-surface md:hidden">
         <form action="{{ route('search') }}" method="get" role="search" class="container-x flex gap-2 py-3">
             <label class="sr-only" for="q-m">Search</label>
-            <input id="q-m" name="q" value="{{ request('q') }}" type="search" placeholder="Search products, SKU or phone model" class="field !rounded-full !py-2.5" x-effect="if (search) $nextTick(() => $el.focus())">
+            <input id="q-m" name="q" value="{{ request('q') }}" type="search" placeholder="Search consoles, keyboards, headsets or SKU" class="field !rounded-full !py-2.5" x-effect="if (search) $nextTick(() => $el.focus())">
             <button class="btn btn-primary !px-5">Search</button>
         </form>
     </div>
@@ -166,7 +166,7 @@
         <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4 text-sm">
             <div>
                 <p class="break-words text-lg font-bold">{{ $storeName }}<span class="text-accent">.</span></p>
-                <p class="mt-3 text-white/60">Accessories for every major phone brand. Retail and wholesale.</p>
+                <p class="mt-3 text-white/60">Premium gaming gear: consoles, keyboards, headsets and more. Retail and wholesale.</p>
             </div>
             <div>
                 <p class="font-semibold mb-3">Shop</p>
@@ -196,11 +196,19 @@
                     <li><a href="{{ route('page', 'privacy-policy') }}">Privacy policy</a></li>
                     <li><a href="{{ route('page', 'terms-and-conditions') }}">Terms & conditions</a></li>
                     <li><a href="{{ url('/admin/login') }}">Admin login</a></li>
-                    @if ($email = StoreSetting::get('contact_email')) <li>{{ $email }}</li> @endif
+                    @if ($email = StoreSetting::get('contact_email')) <li><a href="mailto:{{ $email }}" class="break-all hover:text-white">{{ $email }}</a></li> @endif
+                    @if ($phone = StoreSetting::get('contact_phone')) <li>{{ $phone }}</li> @endif
+                    @if ($wa = preg_replace('/\D/', '', (string) StoreSetting::get('whatsapp_number'))) <li><a href="https://wa.me/{{ $wa }}" target="_blank" rel="noopener">WhatsApp us</a></li> @endif
                 </ul>
             </div>
         </div>
         <div class="border-t border-white/10 py-5 text-center text-xs text-white/50">© {{ date('Y') }} {{ $storeName }}. All rights reserved.</div>
     </footer>
+    @if ($wa ?? null)
+        <a href="https://wa.me/{{ $wa }}?text={{ rawurlencode('Hi '.$storeName.', I have a question about a product.') }}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"
+           class="fixed bottom-4 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:scale-105">
+            <svg viewBox="0 0 24 24" class="h-7 w-7 fill-current" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0C5.4 0 .1 5.3.1 11.9c0 2.1.6 4.1 1.6 5.9L0 24l6.4-1.7a11.9 11.9 0 0 0 5.6 1.4c6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.200-3.400-8.300zM12 21.700c-1.800 0-3.500-.5-5-1.400l-.4-.2-3.800 1 1-3.700-.2-.4a9.800 9.800 0 0 1-1.500-5.200C2.100 6.500 6.500 2.100 12 2.100c2.600 0 5.100 1 6.900 2.900a9.700 9.700 0 0 1 2.900 6.900c0 5.400-4.400 9.800-9.800 9.800zm5.400-7.300c-.3-.1-1.800-.9-2-1s-.5-.1-.7.100-.8 1-.9 1.100-.3.2-.6.100a8 8 0 0 1-2.400-1.500 9 9 0 0 1-1.600-2c-.2-.3 0-.5.100-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2.200c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.100-.8.400s-1 1-1 2.400 1 2.800 1.200 3 2 3.100 4.900 4.300c.7.300 1.200.5 1.600.6.700.2 1.300.2 1.800.1.500-.1 1.800-.7 2-1.400s.3-1.300.2-1.400-.3-.2-.6-.3z"/></svg>
+        </a>
+    @endif
 </body>
 </html>

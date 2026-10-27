@@ -10,177 +10,224 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 /**
- * Developer tool: collects real Pakistani listings from PriceOye into database/seed-assets/ so that
- * RealCatalogSeeder can run offline: name, brand, PKR price, specifications, colour options with their own
- * photo galleries and availability, and the public reviews shown for the product on the source site.
+ * Developer tool: collects real Pakistani market listings (gaming consoles, controllers, keyboards, mice, headsets,
+ * chairs, VR) into database/seed-assets/ so RealCatalogSeeder can run offline: name, brand, PKR market price,
+ * specifications, colour options (with price/availability) and product photos.
  *
- * LEGAL: product images, listing data and reviews belong to their owners (PriceOye, the brands, the reviewers).
- * Get permission before using them on a live store. Every record keeps its source URL for attribution/takedown.
+ * Source: Qeemat (qeemat.com.pk), a Pakistani price-comparison site. The price is the LOWEST current market offer, i.e. a
+ * market reference, not your selling price: set your own prices in Admin > Products. Links to other shops are never stored.
+ *
+ * LEGAL: photos and listing data belong to their owners (Qeemat, the brands and photographers). Get permission before using
+ * them on a live store. Each record keeps its source page URL (internal only) for attribution/takedown.
  */
 class ScrapeCatalog extends Command
 {
-    protected $signature = 'catalog:scrape {--limit=0 : Max products per listing page (0 = all)} {--no-images}';
+    protected $signature = 'catalog:scrape {--pages=0 : Cap pages per category (0 = default caps)} {--min-price=25000} {--no-images}';
 
-    protected $description = 'Scrape real PriceOye listings, colour galleries and specs into database/seed-assets';
+    protected $description = 'Scrape real Pakistani gaming listings (prices, specs, colours, photos) into database/seed-assets';
 
-    private const IMAGE_BASE = 'https://images.priceoye.pk/';
-
-    private const MAX_IMAGES_PER_COLOR = 3;
-
-    private const LISTINGS = [
-        ['https://priceoye.pk/power-banks', 'Power Banks'],
-        ['https://priceoye.pk/power-banks/anker', 'Power Banks'],
-        ['https://priceoye.pk/mobile-chargers', 'Chargers & Adapters'],
-        ['https://priceoye.pk/mobile-chargers/anker', 'Chargers & Adapters'],
-        ['https://priceoye.pk/mobile-chargers/samsung', 'Chargers & Adapters'],
-        ['https://priceoye.pk/mobile-cables', 'Cables'],
-        ['https://priceoye.pk/wireless-earbuds', 'Earbuds & Headphones'],
-        ['https://priceoye.pk/wireless-chargers', 'Wireless Chargers'],
-        ['https://priceoye.pk/mobile-car-chargers', 'Car Accessories'],
-        ['https://priceoye.pk/mobile-car-chargers/samsung', 'Car Accessories'],
-    ];
+    private const BASE = 'https://qeemat.com.pk';
 
     private const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36';
+
+    /** slug => [store category, max pages, filter] ; filter: all | gaming | gaming_or_premium */
+    private const LISTINGS = [
+        'game-consoles' => ['Game Consoles', 3, 'all'],
+        'game-controllers' => ['Controllers & Gamepads', 10, 'all'],
+        'keyboard' => ['Gaming Keyboards', 41, 'gaming'],
+        'mouse' => ['Gaming Mice', 13, 'gaming'],
+        'headphones' => ['Gaming Headsets & Headphones', 25, 'gaming_or_premium'],
+        'monitors' => ['Gaming Monitors', 10, 'gaming_or_premium'],
+        'vr-headsets-accessories' => ['VR Headsets', 1, 'all'],
+    ];
+
+    private const GAMING = '/razer|logitech g|logitech pro|g pro|g502|g915|g733|g435|steelseries|arctis|apex|rog|republic of gamers|corsair|hyperx|keychron|redragon|msi |akko|skyloong|attack shark|royal kludge|rk[0-9]|wooting|ducky|glorious|cooler master|legion|predator|aorus|fantech|havit|zowie|benq|turtle beach|jbl quantum|astro|roccat|alienware|nzxt|gamesir|8bitdo|pulse|playstation|xbox|nintendo|gaming|mechanical|rgb|lamzu|pulsar|endgame|ajazz|bloody|g-wolves|vgn|zaopin|madlions|wolf king|odyssey|tuf|nitro|curved|1[0-9]{2}hz|2[0-9]{2}hz|oled|ultrawide|xg[0-9]|g[0-9]{2}[a-z]|sennheiser|sony|bose|audeze|beyerdynamic|dolby/i';
+
+    private const COLORS = ['Black', 'White', 'Blue', 'Red', 'Green', 'Grey', 'Gray', 'Silver', 'Pink', 'Purple', 'Orange', 'Yellow', 'Gold', 'Beige', 'Brown', 'Navy', 'Cream', 'Mint', 'Lavender', 'Violet', 'Titanium', 'Midnight', 'Starlight', 'Cyan', 'Teal', 'Rose'];
 
     public function handle(): int
     {
         $dir = database_path('seed-assets');
         File::ensureDirectoryExists("$dir/images");
-        $items = [];
+        $min = (int) $this->option('min-price');
+        $cards = [];
 
-        foreach (self::LISTINGS as [$url, $category]) {
-            $found = $this->parseListing(Http::withUserAgent(self::UA)->timeout(40)->get($url)->body(), $category);
-            $this->line(count($found)." cards from $url");
-            foreach (($this->option('limit') ? array_slice($found, 0, (int) $this->option('limit')) : $found) as $it) {
-                $items[$it['page']] ??= $it;
+        foreach (self::LISTINGS as $slug => [$category, $maxPages, $filter]) {
+            $cap = (int) $this->option('pages') ?: $maxPages;
+            $kept = 0;
+            for ($page = 1; $page <= $cap; $page++) {
+                $r = $this->fetch(self::BASE."/cl/$slug", $page > 1 ? ['page' => $page] : []);
+                $found = $r ? $this->parseListing($r->body()) : [];
+                if ($found === []) {
+                    break;
+                }
+                foreach ($found as $c) {
+                    if ($c['price'] >= $min && $this->passes($filter, $c)) {
+                        $cards[$c['page']] ??= $c + ['category' => $category];
+                        $kept++;
+                    }
+                }
+                usleep(250000);
             }
-            usleep(300000);
+            $this->line("$category: $kept kept");
         }
 
-        $this->info(count($items).' unique products. Fetching details...');
-        $out = [];
-        foreach ($items as $it) {
-            $detail = $this->detail($it);
-            if ($detail === null) {
-                $this->warn("skip (no detail): {$it['name']}");
-
-                continue;
+        $this->info(count($cards).' products to fetch...');
+        $details = [];
+        foreach ($cards as $c) {
+            $d = $this->detail($c);
+            if ($d) {
+                $details[] = $d;
+            } else {
+                $this->warn('skipped '.$c['page']);
             }
-            $out[] = $detail;
-            usleep(250000);
+            usleep(200000);
         }
 
+        $out = $this->groupColours($details);
         File::put("$dir/catalog.json", json_encode($out, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        $this->info(count($out).' products written; '.count(File::files("$dir/images")).' image files.');
+        $this->info(count($out).' products ('.array_sum(array_map(fn ($p) => count($p['colors']), $out)).' variants); '.count(File::files("$dir/images")).' image files.');
 
         return self::SUCCESS;
     }
 
-    /** @return array<int, array{name:string,page:string,price:int,image:?string,category:string}> */
-    private function parseListing(string $html, string $category): array
+    /** GET with retries; the source resets connections now and then. Returns null when it keeps failing. */
+    private function fetch(string $url, array $query = []): ?\Illuminate\Http\Client\Response
+    {
+        for ($try = 1; $try <= 4; $try++) {
+            try {
+                $r = Http::withUserAgent(self::UA)->timeout(60)->get($url, $query);
+                if ($r->ok()) {
+                    return $r;
+                }
+            } catch (\Throwable) {
+            }
+            sleep($try);
+        }
+
+        return null;
+    }
+
+    private function passes(string $filter, array $c): bool
+    {
+        $gaming = (bool) preg_match(self::GAMING, $c['name']);
+
+        return match ($filter) {
+            'gaming' => $gaming,
+            'gaming_or_premium' => $gaming || $c['price'] >= 45000,
+            default => true,
+        };
+    }
+
+    /** @return array<int, array{name:string,page:string,price:int}> */
+    private function parseListing(string $html): array
     {
         $dom = new DOMDocument;
         libxml_use_internal_errors(true);
         $dom->loadHTML('<?xml encoding="utf-8"?>'.$html);
         libxml_clear_errors();
         $xp = new DOMXPath($dom);
-        $rows = [];
-
-        foreach ($xp->query('//div[contains(@class,"productBox")]') as $card) {
-            $a = $xp->query('.//a[@href]', $card)->item(0);
-            $name = trim($a?->getAttribute('data-vars-value') ?? '');
-            $page = $a?->getAttribute('href');
-            $priceTxt = $xp->query('.//div[contains(@class,"price-box")]', $card)->item(0)?->textContent ?? '';
-            $price = (int) preg_replace('/\D/', '', preg_replace('/^\s*Rs/i', '', trim($priceTxt)));
-            if (! $name || ! $page || $price <= 0) {
-                continue;
+        $out = [];
+        foreach ($xp->query('//a[contains(@href,"/dp/")][@aria-label]') as $a) {
+            if (preg_match('/^(.*) - Best price Rs\.?\s*([\d,]+)/u', $a->getAttribute('aria-label'), $m)) {
+                $img = $xp->query('.//img', $a)->item(0);
+                $out[$a->getAttribute('href')] = ['name' => html_entity_decode(trim($m[1])), 'price' => (int) str_replace(',', '', $m[2]), 'page' => $a->getAttribute('href'),
+                    'img' => $img ? ($img->getAttribute('src') ?: $img->getAttribute('data-src')) : null];
             }
-            $img = $xp->query('.//img', $card)->item(0)?->getAttribute('src');
-            $img = $img ? preg_replace('/-\d+x\d+\.webp$/', '.webp', $img) : null;
-            $rows[] = ['name' => html_entity_decode($name), 'page' => $page, 'price' => $price, 'image' => $img, 'category' => $category];
         }
 
-        return $rows;
+        return array_values($out);
     }
 
-    private function detail(array $it): ?array
+    private function detail(array $c): ?array
     {
-        $r = Http::withUserAgent(self::UA)->timeout(40)->get($it['page']);
-        $d = $r->ok() ? $this->state($r->body()) : null;
-        if (! $d) {
+        $r = $this->fetch($c['page']);
+        if (! $r) {
             return null;
         }
-
-        $slug = Str::slug($it['name']);
-        $data = $d['dataSet'] ?? [];
-
-        // ---- specifications: {"Battery":[{"Capacity":"10000 mAh",...}], ...} -> ["Battery · Capacity" => "10000 mAh"]
-        $specs = [];
-        $raw = json_decode($data['specification'] ?? '', true);
-        foreach ((array) $raw as $group => $rows) {
-            foreach ((array) $rows as $row) {
-                foreach ((array) $row as $k => $v) {
-                    if (is_scalar($v) && trim((string) $v) !== '' && ! in_array(strtolower(trim((string) $v)), ['no', 'n/a', 'null'], true)) {
-                        $specs["$group · $k"] = trim((string) $v);
+        $html = $r->body();
+        $product = null;
+        $groupBrand = null;
+        if (preg_match_all('#<script[^>]*application/ld\+json[^>]*>(.*?)</script>#s', $html, $m)) {
+            foreach ($m[1] as $j) {
+                $d = json_decode($j, true);
+                // a block is either one object or a list (ProductGroup + Product for variant pages)
+                foreach (is_array($d) && array_is_list($d) ? $d : [$d] as $node) {
+                    $type = $node['@type'] ?? '';
+                    if ($type === 'Product') {
+                        $product = $node;
+                    } elseif ($type === 'ProductGroup') {
+                        $groupBrand = $node['brand']['name'] ?? null;
                     }
                 }
             }
         }
-
-        // ---- colours: availability + price from dataPrices, galleries from product_color_images
-        $colors = [];
-        foreach ((array) ($d['product_config']['dataPrices'] ?? []) as $colorKey => $groups) {
-            $entry = $groups[0][0] ?? null;
-            if (! $entry) {
-                continue;
-            }
-            $files = (array) ($d['product_color_images'][$colorKey]['large'] ?? []);
-            $saved = [];
-            foreach (array_slice($files, 0, self::MAX_IMAGES_PER_COLOR) as $n => $file) {
-                $saved[] = $this->download(self::IMAGE_BASE.$file, "$slug-".Str::slug($colorKey)."-$n.webp");
-            }
-            $colors[] = [
-                'name' => $colorKey === '0' || $colorKey === '' ? null : Str::title(str_replace(['-', '_'], ' ', $colorKey)),
-                'price' => (int) preg_replace('/\D/', '', (string) ($entry['product_price'] ?? $it['price'])) ?: $it['price'],
-                'available' => ($entry['product_availability'] ?? '') !== 'Out Of Stock' && (int) ($entry['stock_qty'] ?? 1) > 0,
-                'images' => array_values(array_filter($saved)),
-            ];
-        }
-        if ($colors === []) {
-            $colors[] = ['name' => null, 'price' => $it['price'], 'available' => true, 'images' => []];
+        if (! $product) {
+            return null;
         }
 
-        // Fallback main image from the listing when no colour gallery could be downloaded.
-        $fallback = null;
-        if (! array_filter(array_column($colors, 'images')) && $it['image']) {
-            foreach (['', '-500x500', '-270x270'] as $suffix) {
-                $fallback = $this->download(preg_replace('/\.webp$/', $suffix.'.webp', $it['image']), "$slug.webp");
-                if ($fallback) {
-                    break;
+        $offers = $product['offers'] ?? [];
+        $price = (int) round($offers['lowPrice'] ?? $offers['price'] ?? $c['price']);
+        $inStock = collect($offers['offers'] ?? [])->contains(fn ($o) => str_contains((string) ($o['availability'] ?? ''), 'InStock'));
+        $slug = Str::slug($c['name']);
+
+        $images = [];
+        foreach (array_slice((array) ($product['image'] ?? []), 0, 3) as $n => $url) {
+            $url = is_array($url) ? ($url['url'] ?? '') : $url;
+            if ($f = $this->download((string) $url, "$slug-$n.webp")) {
+                $images[] = $f;
+            }
+        }
+
+        // the structured-data photo is sometimes a dead link for variant pages: fall back to the listing thumbnail
+        if ($images === [] && ! empty($c['img']) && ($f = $this->download((string) $c['img'], "$slug-card.webp"))) {
+            $images[] = $f;
+        }
+
+        return [
+            'name' => $c['name'], 'category' => $c['category'], 'page' => $c['page'], 'price' => $price,
+            'brand' => (is_array($product['brand'] ?? null) ? ($product['brand']['name'] ?? null) : ($product['brand'] ?? null)) ?: $groupBrand,
+            'specs' => $this->parseSpecs($html), 'available' => $inStock, 'images' => $images,
+        ];
+    }
+
+    /** "General Information" => [Brand => X] becomes ["General Information · Brand" => "X"]. */
+    private function parseSpecs(string $html): array
+    {
+        $dom = new DOMDocument;
+        libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="utf-8"?>'.$html);
+        libxml_clear_errors();
+        $xp = new DOMXPath($dom);
+        $specs = [];
+        foreach ($xp->query('//h2[normalize-space()="Specifications"]/following-sibling::div[1]//h3') as $h3) {
+            $group = trim(preg_replace('/\s+/', ' ', $h3->textContent));
+            $dl = $xp->query('following-sibling::div[1]//dl', $h3)->item(0);
+            foreach ($dl ? $xp->query('.//div[dt and dd]', $dl) : [] as $row) {
+                $k = trim($xp->query('dt', $row)->item(0)?->textContent ?? '');
+                $v = trim(preg_replace('/\s+/', ' ', $xp->query('dd', $row)->item(0)?->textContent ?? ''));
+                if ($k !== '' && $v !== '' && ! in_array(strtolower($v), ['n/a', '-', 'no', 'null'], true) && ! in_array($k, ['Category'], true)) {
+                    $specs["$group · $k"] = $v;
                 }
             }
         }
 
-        return [
-            'name' => $it['name'], 'category' => $it['category'], 'page' => $it['page'], 'price' => $it['price'],
-            'brand' => html_entity_decode((string) ($d['brand'] ?? $data['brand_name'] ?? '')) ?: null,
-            'specs' => $specs, 'colors' => $colors, 'fallback_image' => $fallback,
-        ];
+        return $specs;
     }
 
-    /** Download only genuine WebP photos (the site serves an SVG "no image" placeholder for some files). */
     private function download(string $url, string $file): ?string
     {
-        if ($this->option('no-images')) {
+        if ($this->option('no-images') || ! str_starts_with($url, 'http')) {
             return null;
         }
         $path = database_path("seed-assets/images/$file");
         if (File::exists($path)) {
             return $file;
         }
-        $r = Http::withUserAgent(self::UA)->timeout(40)->get($url);
-        $b = $r->body();
-        if ($r->ok() && strlen($b) > 1000 && str_starts_with($b, 'RIFF') && substr($b, 8, 4) === 'WEBP') {
+        $r = $this->fetch($url);
+        $b = $r?->body() ?? '';
+        // keep only genuine WebP photos
+        if ($r && strlen($b) > 1000 && str_starts_with($b, 'RIFF') && substr($b, 8, 4) === 'WEBP') {
             File::put($path, $b);
 
             return $file;
@@ -189,42 +236,50 @@ class ScrapeCatalog extends Command
         return null;
     }
 
-    /** Parses `window.product_data = {...};` embedded in the product page. */
-    private function state(string $html): ?array
+    /**
+     * The source lists each colour as its own product ("... Black" / "... White"). Group them into one product with a
+     * variant per colour (own price, availability and photos).
+     */
+    private function groupColours(array $items): array
     {
-        $p = strpos($html, 'window.product_data = ');
-        if ($p === false) {
-            return null;
+        $pattern = '/\s+('.implode('|', self::COLORS).')(\s+(?:Edition|Version))?$/i';
+        $groups = [];
+        foreach ($items as $it) {
+            $color = null;
+            $base = $it['name'];
+            if (preg_match($pattern, $it['name'], $m)) {
+                $color = Str::title($m[1]);
+                $base = trim(preg_replace($pattern, '', $it['name']));
+            }
+            $key = Str::lower($base).'|'.$it['category'];
+            $groups[$key] ??= ['base' => $base, 'items' => []];
+            $groups[$key]['items'][] = $it + ['color' => $color];
         }
-        $p += 22;
-        $depth = 0;
-        $in = false;
-        $esc = false;
-        $end = null;
-        $n = strlen($html);
-        for ($i = $p; $i < $n; $i++) {
-            $ch = $html[$i];
-            if ($in) {
-                if ($esc) {
-                    $esc = false;
-                } elseif ($ch === chr(92)) {
-                    $esc = true;
-                } elseif ($ch === chr(34)) {
-                    $in = false;
+
+        $out = [];
+        foreach ($groups as $g) {
+            $first = $g['items'][0];
+            $multi = count($g['items']) > 1 && collect($g['items'])->every(fn ($i) => $i['color']);
+            $colors = $multi
+                ? array_map(fn ($i) => ['name' => $i['color'], 'price' => $i['price'], 'available' => $i['available'], 'images' => $i['images'], 'page' => $i['page']], $g['items'])
+                : [['name' => $first['color'], 'price' => $first['price'], 'available' => $first['available'], 'images' => $first['images'], 'page' => $first['page']]];
+            if (! $multi && count($g['items']) > 1) {
+                // same base name but not all coloured: keep each as its own product
+                foreach ($g['items'] as $i) {
+                    $out[] = $this->product($i['name'], $i, [['name' => $i['color'], 'price' => $i['price'], 'available' => $i['available'], 'images' => $i['images'], 'page' => $i['page']]]);
                 }
 
                 continue;
             }
-            if ($ch === chr(34)) {
-                $in = true;
-            } elseif ($ch === '{') {
-                $depth++;
-            } elseif ($ch === '}' && --$depth === 0) {
-                $end = $i;
-                break;
-            }
+            $out[] = $this->product($multi ? $g['base'] : $first['name'], $first, $colors);
         }
 
-        return $end ? json_decode(substr($html, $p, $end - $p + 1), true, 512, JSON_INVALID_UTF8_SUBSTITUTE) : null;
+        return $out;
+    }
+
+    private function product(string $name, array $first, array $colors): array
+    {
+        return ['name' => $name, 'category' => $first['category'], 'page' => $first['page'], 'price' => min(array_column($colors, 'price')),
+            'brand' => $first['brand'], 'specs' => $first['specs'], 'colors' => $colors, 'fallback_image' => null];
     }
 }

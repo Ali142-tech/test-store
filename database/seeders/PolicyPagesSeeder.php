@@ -6,7 +6,7 @@ use App\Models\Page;
 use Illuminate\Database\Seeder;
 
 /**
- * Store policy pages. Written as sensible, standard e-commerce terms for a Pakistan-based accessories store that sells
+ * Store policy pages. Written as sensible, standard e-commerce terms for a Pakistan-based gaming store that sells
  * to retail and wholesale customers (COD / bank transfer). They are a drafting aid, NOT legal advice: have them
  * reviewed against your real operations and applicable law before launch.
  *
@@ -31,9 +31,9 @@ class PolicyPagesSeeder extends Seeder
     {
         return [
             'about' => ['About us', <<<'HTML'
-<p>{store_name} is an online store for mobile phone accessories: chargers, cables, power banks, earbuds and headphones, wireless chargers and car accessories for iPhone, Samsung Galaxy, Google Pixel, Xiaomi, Oppo, Vivo, OnePlus and other popular phones.</p>
+<p>{store_name} is an online store for premium gaming gear: consoles (PlayStation, Xbox, Nintendo), controllers, mechanical keyboards, gaming mice, headsets, gaming monitors and VR headsets from leading brands.</p>
 <h2>Retail and wholesale</h2>
-<p>We serve two kinds of customers. Individual shoppers can buy single items at retail prices. Mobile shops, resellers and other businesses can apply for a wholesale account to see bulk pricing, place large orders and request custom quotations.</p>
+<p>We serve two kinds of customers. Individual shoppers can buy single items at retail prices. Gaming shops, resellers and other businesses can apply for a wholesale account to see bulk pricing, place large orders and request custom quotations.</p>
 <h2>How we list products</h2>
 <ul>
 <li>Every product page shows the brand, model, colour options and the specifications published for that model.</li>
@@ -42,7 +42,7 @@ class PolicyPagesSeeder extends Seeder
 </ul>
 <h2>Contact</h2>
 <p>Questions about an order, a product or wholesale pricing? Reach us through {contact_link}.</p>
-HTML, 'About our mobile accessories store for retail and wholesale customers in Pakistan.'],
+HTML, 'About our gaming gear store for retail and wholesale customers in Pakistan.'],
 
             'shipping-policy' => ['Shipping policy', <<<'HTML'
 <p><em>Last updated: {updated_date}</em></p>
@@ -84,7 +84,7 @@ HTML, 'Delivery areas, charges, times and tracking for orders in Pakistan.'],
 </ul>
 <h2>What cannot be returned</h2>
 <ul>
-<li>Earbuds, headphones and other in-ear products that have been opened, for hygiene reasons, unless they are defective.</li>
+<li>Headsets, earbuds and other in-ear products that have been opened, for hygiene reasons, unless they are defective.</li>
 <li>Items damaged by misuse, liquid, unauthorised repair, or use of an incompatible charger or cable.</li>
 <li>Wholesale and quoted orders, except for defects, wrong items or damage in transit, because they are priced and stocked specially for you.</li>
 </ul>
@@ -199,7 +199,7 @@ HTML, 'Terms that apply to using our website and placing orders.'],
 <ul>
 <li>Damage from drops, liquids, heat, misuse or unauthorised repair.</li>
 <li>Normal wear (for example worn cables, scratched surfaces, reduced battery capacity over time).</li>
-<li>Use with equipment that does not meet the product's specifications, or counterfeit accessories.</li>
+<li>Use with equipment that does not meet the product's specifications, or counterfeit accessories or third-party modifications.</li>
 </ul>
 <h2>Making a claim</h2>
 <ol>

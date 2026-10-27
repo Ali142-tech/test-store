@@ -24,9 +24,9 @@ class ContentSeeder extends Seeder
         }
 
         $settings = [
-            'store_name' => 'Voltix', 'currency' => 'PKR', 'currency_symbol' => 'Rs',
+            'store_name' => 'DigiPower LLC', 'currency' => 'PKR', 'currency_symbol' => 'Rs',
             'announcement' => 'Prices in PKR · Retail and wholesale accounts available',
-            'contact_email' => '', 'contact_phone' => '', // set real contact details in Admin > Store settings
+            'contact_email' => 'Mushaf@digipowerllc.com', 'contact_phone' => '+1 858 832 0759 / +92 302 7171164', 'whatsapp_number' => '923027171164',
             'tax_rate' => '0', 'guest_checkout' => '1',
             'wholesale_min_order_value' => '0',
         ];
