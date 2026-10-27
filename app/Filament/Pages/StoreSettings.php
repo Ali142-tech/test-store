@@ -35,7 +35,7 @@ class StoreSettings extends Page implements HasSchemas
     private const KEYS = [
         'store_name', 'announcement', 'contact_email', 'contact_phone', 'whatsapp_number', 'currency', 'currency_symbol', 'tax_rate', 'guest_checkout',
         'wholesale_min_order_value', 'payment_cod_enabled', 'payment_cod_wholesale', 'payment_bank_enabled',
-        'bank_name', 'bank_account_title', 'bank_account_number', 'bank_instructions',
+        'bank_name', 'bank_account_title', 'bank_account_number', 'bank_instructions', 'bank_international_note',
     ];
 
     public static function canAccess(): bool
@@ -70,6 +70,7 @@ class StoreSettings extends Page implements HasSchemas
                 Toggle::make('payment_bank_enabled')->label('Bank transfer'),
                 TextInput::make('bank_name'), TextInput::make('bank_account_title'), TextInput::make('bank_account_number'),
                 Textarea::make('bank_instructions')->columnSpanFull(),
+                Textarea::make('bank_international_note')->label('Note for customers paying from outside Pakistan')->columnSpanFull(),
             ]),
         ]);
     }

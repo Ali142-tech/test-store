@@ -9,6 +9,9 @@ use App\Models\StoreSetting;
 /** Bank transfer: customer pays offline using the order reference; staff verify the transfer manually. */
 class BankTransferGateway implements PaymentGateway
 {
+    /** Default wording; editable in Admin > Store settings (bank_international_note). */
+    public const INTERNATIONAL_NOTE = 'Payments from outside Pakistan: please use Taptap Send or Remitly to send the amount to the account above, and use your order reference as the payment reference.';
+
     public function code(): string
     {
         return 'bank_transfer';
@@ -44,6 +47,7 @@ class BankTransferGateway implements PaymentGateway
             'Account title' => StoreSetting::get('bank_account_title'),
             'Account number / IBAN' => StoreSetting::get('bank_account_number'),
             'Instructions' => StoreSetting::get('bank_instructions'),
+            'Paying from outside Pakistan' => StoreSetting::get('bank_international_note', self::INTERNATIONAL_NOTE),
         ]);
     }
 }

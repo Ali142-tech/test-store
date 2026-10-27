@@ -34,6 +34,7 @@ class ContentSeeder extends Seeder
             'payment_cod_enabled' => '1', 'payment_cod_wholesale' => '0', 'payment_bank_enabled' => '1',
             'bank_name' => '', 'bank_account_title' => '', 'bank_account_number' => '',
             'bank_instructions' => 'Use your order reference as the payment reference and email the receipt to us.',
+            'bank_international_note' => 'Payments from outside Pakistan: please use Taptap Send or Remitly to send the amount to the account above, and use your order reference as the payment reference.',
         ];
 
         // Default delivery: all cities, retail flat rate + wholesale freight. Editable in the admin panel.
