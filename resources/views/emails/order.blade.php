@@ -7,14 +7,14 @@ Order **{{ $order->reference }}** - status: **{{ ucfirst($order->status) }}**.
 | Item | Qty | Total |
 |:-----|:---:|------:|
 @foreach ($order->items as $i)
-| {{ $i->product_name }}{{ $i->variant_name ? ' ('.$i->variant_name.')' : '' }} | {{ $i->quantity }} | {{ number_format((float) $i->line_total) }} |
+| {{ $i->product_name }}{{ $i->variant_name ? ' ('.$i->variant_name.')' : '' }} | {{ $i->quantity }} | {{ \App\Support\Money::order($i->line_total, $order) }} |
 @endforeach
 </x-mail::table>
 
-Subtotal: {{ number_format((float) $order->subtotal) }}  
-Discount: -{{ number_format((float) $order->discount_total) }}  
-Shipping: {{ number_format((float) $order->shipping_total) }}  
-**Total: {{ $order->currency }} {{ number_format((float) $order->grand_total) }}**
+Subtotal: {{ \App\Support\Money::order($order->subtotal, $order) }}  
+Discount: -{{ \App\Support\Money::order($order->discount_total, $order) }}  
+Shipping: {{ \App\Support\Money::order($order->shipping_total, $order) }}  
+**Total: {{ \App\Support\Money::order($order->grand_total, $order) }}**
 
 @if ($order->payment_method === 'bank_transfer' && $order->payment_status === 'pending')
 Please transfer the total using **{{ $order->reference }}** as the payment reference:

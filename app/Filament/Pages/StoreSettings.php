@@ -33,7 +33,7 @@ class StoreSettings extends Page implements HasSchemas
     private const BOOLEANS = ['guest_checkout', 'payment_cod_enabled', 'payment_cod_wholesale', 'payment_bank_enabled'];
 
     private const KEYS = [
-        'store_name', 'announcement', 'contact_email', 'contact_phone', 'whatsapp_number', 'currency', 'currency_symbol', 'tax_rate', 'guest_checkout',
+        'store_name', 'announcement', 'contact_email', 'contact_phone', 'whatsapp_number', 'currency', 'currency_symbol', 'rate_usd', 'rate_gbp', 'rate_eur', 'extra_usd', 'tax_rate', 'guest_checkout',
         'wholesale_min_order_value', 'payment_cod_enabled', 'payment_cod_wholesale', 'payment_bank_enabled',
         'bank_name', 'bank_account_title', 'bank_account_number', 'bank_instructions', 'bank_international_note',
     ];
@@ -59,6 +59,10 @@ class StoreSettings extends Page implements HasSchemas
                 TextInput::make('store_name')->required(), TextInput::make('announcement')->helperText('Shown in the bar at the top of every page.'),
                 TextInput::make('contact_email')->email(), TextInput::make('contact_phone'), TextInput::make('whatsapp_number')->helperText('International format, digits only, e.g. 923027171164'),
                 TextInput::make('currency')->required()->length(3)->helperText('ISO code, e.g. PKR'), TextInput::make('currency_symbol')->required(),
+                TextInput::make('rate_usd')->label('PKR per 1 USD (USA / Canada)')->numeric()->minValue(1),
+                TextInput::make('rate_gbp')->label('PKR per 1 GBP (United Kingdom)')->numeric()->minValue(1),
+                TextInput::make('rate_eur')->label('PKR per 1 EUR (Eurozone)')->numeric()->minValue(1),
+                TextInput::make('extra_usd')->label('Extra fee per unit for USD/GBP/EUR customers (in US$)')->numeric()->minValue(0)->helperText('Added to every product price for visitors in the USA, Canada, UK and Eurozone. Set 0 to turn off.'),
                 TextInput::make('tax_rate')->numeric()->minValue(0)->maxValue(100)->suffix('%')->helperText('Added on top of goods after discounts. 0 = no tax.'),
                 Toggle::make('guest_checkout')->label('Allow guest checkout'),
             ]),

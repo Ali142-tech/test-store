@@ -24,7 +24,7 @@ class ContentSeeder extends Seeder
         }
 
         $settings = [
-            'store_name' => 'DigiPower LLC', 'currency' => 'PKR', 'currency_symbol' => 'Rs',
+            'store_name' => 'DigiPower LLC', 'rate_usd' => '280', 'rate_gbp' => '370', 'rate_eur' => '325', 'extra_usd' => '30', 'currency' => 'PKR', 'currency_symbol' => 'Rs',
             'announcement' => 'Prices in PKR · Retail and wholesale accounts available',
             'contact_email' => 'Mushaf@digipowerllc.com', 'contact_phone' => '+1 858 832 0759 / +92 302 7171164', 'whatsapp_number' => '923027171164',
             'tax_rate' => '0', 'guest_checkout' => '1',

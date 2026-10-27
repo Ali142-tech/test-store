@@ -16,7 +16,7 @@
         </div>
         <h2 class="mt-10 font-semibold">Wholesale orders</h2>
         @forelse ($orders as $o)
-            <a href="{{ route('account.orders.show', $o->reference) }}" class="mt-3 flex justify-between rounded-xl border border-line p-4 text-sm"><span>{{ $o->reference }} · {{ ucfirst($o->status) }}</span><span>{{ Money::format($o->grand_total) }}</span></a>
+            <a href="{{ route('account.orders.show', $o->reference) }}" class="mt-3 flex justify-between rounded-xl border border-line p-4 text-sm"><span>{{ $o->reference }} · {{ ucfirst($o->status) }}</span><span>{{ Money::order($o->grand_total, $o) }}</span></a>
         @empty <p class="mt-3 text-sm text-ink-soft">No wholesale orders yet.</p> @endforelse
     @endif
 </div>

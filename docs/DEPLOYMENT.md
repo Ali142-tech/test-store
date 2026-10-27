@@ -97,3 +97,13 @@ Restoring over production: put the site in maintenance mode (`php artisan down`)
 - [ ] `composer audit` and `npm audit` clean; update dependencies regularly
 - [ ] MySQL user has no global privileges; DB and Redis not exposed publicly
 - [ ] Backups running AND a restore tested
+
+## Currency by country (USD / GBP / EUR)
+
+Prices are stored and charged in PKR. Visitors from the USA/Canada see USD, the UK sees GBP, eurozone countries see EUR and everyone else (including Pakistan) sees PKR. International visitors pay an extra fee on **every unit** (default US$30) which is added server-side and then converted.
+
+- **Run `php artisan migrate --force`** after deploying (adds `display_currency` / `display_rate` to orders).
+- Set the rates and fee in **Admin > Store settings** (PKR per USD / GBP / EUR, extra fee in US$). The seeded rates (280 / 370 / 325) are placeholders: update them to your real rates. Changing a rate never changes orders already placed (each order keeps the rate it was placed with).
+- Country detection: uses the `CF-IPCountry` header when the site is behind Cloudflare (recommended, free, instant); otherwise it looks the visitor's IP up once a day via ip-api.com and caches the answer. If detection fails the visitor simply sees PKR.
+- Do not cache whole HTML pages at a CDN (prices depend on the visitor's country).
+- Shipping rates and the free-shipping threshold are still PKR amounts, converted for display.

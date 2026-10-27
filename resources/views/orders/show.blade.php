@@ -21,7 +21,7 @@
     @if ($order->payment_method === 'bank_transfer' && $order->payment_status === 'pending')
         <div class="mt-6 rounded-2xl border border-line p-5 text-sm">
             <p class="font-semibold">Complete your bank transfer</p>
-            <p class="mt-1 text-ink-soft">Transfer {{ Money::format($order->grand_total) }} and use <strong>{{ $order->reference }}</strong> as the payment reference. We will confirm your order once the payment is verified.</p>
+            <p class="mt-1 text-ink-soft">Transfer {{ Money::order($order->grand_total, $order) }} and use <strong>{{ $order->reference }}</strong> as the payment reference. We will confirm your order once the payment is verified.</p>
             <dl class="mt-3 space-y-1">@foreach ($bank as $label => $value)<div class="flex flex-wrap gap-x-2"><dt class="text-ink-soft">{{ $label }}:</dt><dd class="min-w-0 break-all">{{ $value }}</dd></div>@endforeach</dl>
         </div>
     @endif
@@ -31,18 +31,18 @@
         <tbody class="divide-y divide-line">
         @foreach ($order->items as $i)
             <tr><td class="py-3">{{ $i->product_name }}@if ($i->variant_name) <span class="text-ink-soft">({{ $i->variant_name }})</span>@endif<span class="block text-xs text-ink-soft">SKU {{ $i->sku }}</span></td>
-                <td>{{ $i->quantity }}</td><td class="text-right">{{ Money::format($i->unit_price) }}</td><td class="text-right">{{ Money::format($i->line_total) }}</td></tr>
+                <td>{{ $i->quantity }}</td><td class="text-right">{{ Money::order($i->unit_price, $order) }}</td><td class="text-right">{{ Money::order($i->line_total, $order) }}</td></tr>
         @endforeach
         </tbody>
     </table>
 
     <dl class="ml-auto mt-6 w-full min-w-0 max-w-xs space-y-1 text-sm">
-        <div class="flex justify-between"><dt>Subtotal</dt><dd>{{ Money::format($order->subtotal) }}</dd></div>
-        @if ((float) $order->discount_total > 0)<div class="flex justify-between"><dt>Discount</dt><dd>-{{ Money::format($order->discount_total) }}</dd></div>@endif
-        <div class="flex justify-between gap-3"><dt class="min-w-0 break-words">Shipping ({{ $order->shipping_method_name }})</dt><dd class="shrink-0">{{ Money::format($order->shipping_total) }}</dd></div>
-        @if ((float) $order->tax_total > 0)<div class="flex justify-between"><dt>Tax</dt><dd>{{ Money::format($order->tax_total) }}</dd></div>@endif
-        <div class="flex justify-between border-t border-line pt-2 text-base font-semibold"><dt>Total</dt><dd>{{ Money::format($order->grand_total) }}</dd></div>
-        @if ((float) $order->refunded_total > 0)<div class="flex justify-between text-ink-soft"><dt>Refunded</dt><dd>{{ Money::format($order->refunded_total) }}</dd></div>@endif
+        <div class="flex justify-between"><dt>Subtotal</dt><dd>{{ Money::order($order->subtotal, $order) }}</dd></div>
+        @if ((float) $order->discount_total > 0)<div class="flex justify-between"><dt>Discount</dt><dd>-{{ Money::order($order->discount_total, $order) }}</dd></div>@endif
+        <div class="flex justify-between gap-3"><dt class="min-w-0 break-words">Shipping ({{ $order->shipping_method_name }})</dt><dd class="shrink-0">{{ Money::order($order->shipping_total, $order) }}</dd></div>
+        @if ((float) $order->tax_total > 0)<div class="flex justify-between"><dt>Tax</dt><dd>{{ Money::order($order->tax_total, $order) }}</dd></div>@endif
+        <div class="flex justify-between border-t border-line pt-2 text-base font-semibold"><dt>Total</dt><dd>{{ Money::order($order->grand_total, $order) }}</dd></div>
+        @if ((float) $order->refunded_total > 0)<div class="flex justify-between text-ink-soft"><dt>Refunded</dt><dd>{{ Money::order($order->refunded_total, $order) }}</dd></div>@endif
     </dl>
 
     <div class="mt-8 grid gap-6 text-sm sm:grid-cols-2">

@@ -26,7 +26,7 @@
 
 @push('head')
 <script>
-function productPage(variants, symbol) {
+function productPage(variants, fmt) {
     return {
         variants, selected: 0, qty: 1, img: 0,
         get gallery() { return this.v ? this.v.images : []; },
@@ -39,7 +39,7 @@ function productPage(variants, symbol) {
         clamp() { this.qty = Math.min(Math.max(this.q, this.minQty), Math.max(this.v.available, 1)); },
         init() { const first = this.variants.findIndex(x => x.available > 0); if (first > 0) this.selected = first; this.qty = this.minQty; },
         pick(i) { this.selected = i; this.img = 0; this.qty = Math.min(Math.max(this.qty, this.minQty), Math.max(this.v.available, 1)); },
-        money(n) { return symbol + ' ' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); },
+        money(n) { const d = fmt.decimals; return fmt.symbol + (d ? '' : ' ') + (Number(n) / fmt.rate).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); },
     };
 }
 </script>
@@ -55,7 +55,7 @@ function productPage(variants, symbol) {
 @endpush
 
 @section('content')
-<div class="container-x py-10" x-data="productPage(@js($variants), @js(\App\Models\StoreSetting::get('currency_symbol', 'Rs')))">
+<div class="container-x py-10" x-data="productPage(@js($variants), @js(\App\Support\Money::js()))">
     <nav class="text-xs text-ink-soft" aria-label="Breadcrumb">
         <a href="{{ route('home') }}">Home</a>
         @if ($product->category) / <a href="{{ route('category', $product->category) }}">{{ $product->category->name }}</a> @endif

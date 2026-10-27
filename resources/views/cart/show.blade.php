@@ -25,7 +25,7 @@
                             <a href="{{ route('product', $v->product) }}" class="break-words font-medium">{{ $v->product->name }}</a>
                             @if ($v->name)<p class="text-sm text-ink-soft">{{ $v->name }}</p>@endif
                             <p class="break-all text-xs text-ink-soft">SKU {{ $v->sku }}</p>
-                            <p class="mt-1 text-sm">{{ Money::format($l['unit_price']) }}
+                            <p class="mt-1 text-sm">{{ Money::shop($l['unit_price']) }}
                                 @if ($l['price_source'] === 'tier' || $l['price_source'] === 'negotiated') <span class="ml-1 rounded-full bg-accent-soft px-2 py-0.5 text-xs text-accent">{{ $l['price_source'] === 'tier' ? 'Wholesale tier' : 'Negotiated' }}</span>@endif
                             </p>
                             <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -38,7 +38,7 @@
                                 <form method="post" action="{{ route('cart.remove', $v->id) }}">@csrf @method('DELETE')<button class="text-sm text-ink-soft underline">Remove</button></form>
                             </div>
                         </div>
-                        <p class="shrink-0 font-semibold">{{ Money::format($l['line_total']) }}</p>
+                        <p class="shrink-0 font-semibold">{{ Money::shop($l['line_total']) }}</p>
                     </li>
                 @endforeach
             </ul>
@@ -47,12 +47,12 @@
         <aside class="h-fit rounded-2xl bg-mist p-6">
             <h2 class="font-semibold">Order summary</h2>
             <dl class="mt-4 space-y-2 text-sm">
-                <div class="flex justify-between"><dt>Subtotal</dt><dd>{{ Money::format($calc['subtotal']) }}</dd></div>
-                @if ((float) $calc['discount'] > 0)<div class="flex justify-between text-ok"><dt>Discount ({{ $calc['coupon'] }})</dt><dd>-{{ Money::format($calc['discount']) }}</dd></div>@endif
+                <div class="flex justify-between"><dt>Subtotal</dt><dd>{{ Money::shop($calc['subtotal']) }}</dd></div>
+                @if ((float) $calc['discount'] > 0)<div class="flex justify-between text-ok"><dt>Discount ({{ $calc['coupon'] }})</dt><dd>-{{ Money::shop($calc['discount']) }}</dd></div>@endif
                 <div class="flex justify-between text-ink-soft"><dt>Shipping</dt><dd>Calculated at checkout</dd></div>
-                @if ((float) $calc['tax'] > 0)<div class="flex justify-between"><dt>Tax</dt><dd>{{ Money::format($calc['tax']) }}</dd></div>@endif
+                @if ((float) $calc['tax'] > 0)<div class="flex justify-between"><dt>Tax</dt><dd>{{ Money::shop($calc['tax']) }}</dd></div>@endif
             </dl>
-            <p class="mt-4 flex justify-between border-t border-line pt-4 font-semibold"><span>Total (before shipping)</span><span>{{ Money::format($calc['total']) }}</span></p>
+            <p class="mt-4 flex justify-between border-t border-line pt-4 font-semibold"><span>Total (before shipping)</span><span>{{ Money::shop($calc['total']) }}</span></p>
 
             @if ($cart->coupon_code)
                 <form method="post" action="{{ route('cart.coupon.remove') }}" class="mt-4 flex items-center justify-between text-sm">@csrf @method('DELETE')<span>Coupon <strong>{{ $cart->coupon_code }}</strong></span><button class="underline">Remove</button></form>

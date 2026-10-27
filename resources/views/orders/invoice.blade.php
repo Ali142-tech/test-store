@@ -8,7 +8,7 @@
 <p>Invoice for order <strong>{{ $order->reference }}</strong><br>Date: {{ $order->placed_at?->format('d M Y') }}<br>Payment: {{ str_replace('_', ' ', $order->payment_status) }}</p>
 <p><strong>Bill to</strong><br>{{ $order->billing_address['full_name'] }}<br>{{ $order->billing_address['line1'] }}, {{ $order->billing_address['city'] }}<br>{{ $order->email }}</p>
 <table><thead><tr><th>Item</th><th>SKU</th><th class="r">Qty</th><th class="r">Unit</th><th class="r">Total</th></tr></thead><tbody>
-@foreach ($order->items as $i)<tr><td>{{ $i->product_name }} {{ $i->variant_name }}</td><td>{{ $i->sku }}</td><td class="r">{{ $i->quantity }}</td><td class="r">{{ Money::format($i->unit_price) }}</td><td class="r">{{ Money::format($i->line_total) }}</td></tr>@endforeach
+@foreach ($order->items as $i)<tr><td>{{ $i->product_name }} {{ $i->variant_name }}</td><td>{{ $i->sku }}</td><td class="r">{{ $i->quantity }}</td><td class="r">{{ Money::order($i->unit_price, $order) }}</td><td class="r">{{ Money::order($i->line_total, $order) }}</td></tr>@endforeach
 </tbody></table>
-<p style="text-align:right">Subtotal {{ Money::format($order->subtotal) }}<br>Discount -{{ Money::format($order->discount_total) }}<br>Shipping {{ Money::format($order->shipping_total) }}<br>Tax {{ Money::format($order->tax_total) }}<br><strong>Total {{ Money::format($order->grand_total) }}</strong></p>
+<p style="text-align:right">Subtotal {{ Money::order($order->subtotal, $order) }}<br>Discount -{{ Money::order($order->discount_total, $order) }}<br>Shipping {{ Money::order($order->shipping_total, $order) }}<br>Tax {{ Money::order($order->tax_total, $order) }}<br><strong>Total {{ Money::order($order->grand_total, $order) }}</strong></p>
 </body></html>

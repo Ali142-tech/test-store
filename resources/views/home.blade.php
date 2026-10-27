@@ -29,7 +29,7 @@
                 @foreach ($heroProducts as $p)
                     <a href="{{ route('product', $p) }}" class="anim-float group block overflow-hidden rounded-3xl bg-surface shadow-xl ring-1 ring-black/5 {{ $loop->odd ? 'translate-y-8' : '' }}" style="--r: {{ $loop->odd ? '-2deg' : '2deg' }}; animation-delay: {{ $loop->index * .5 }}s">
                         <div class="photo-bg aspect-square">@if ($p->primaryImageUrl())<img src="{{ $p->primaryImageUrl() }}" alt="{{ $p->name }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" @if (! $loop->first) loading="lazy" @endif>@endif</div>
-                        <div class="p-3"><p class="line-clamp-1 text-xs font-medium">{{ $p->name }}</p><p class="text-sm font-bold">{{ Money::format($p->defaultVariant?->currentRetailPrice()) }}</p></div>
+                        <div class="p-3"><p class="line-clamp-1 text-xs font-medium">{{ $p->name }}</p><p class="text-sm font-bold">{{ Money::unit($p->defaultVariant?->currentRetailPrice()) }}</p></div>
                     </a>
                 @endforeach
             </div>

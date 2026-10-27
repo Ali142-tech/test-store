@@ -9,6 +9,6 @@
 </div>
 <h2 class="mt-10 font-semibold">Recent orders</h2>
 @forelse ($recent as $o)
-    <a href="{{ route('account.orders.show', $o->reference) }}" class="mt-3 flex justify-between rounded-xl border border-line p-4 text-sm hover:border-accent"><span>{{ $o->reference }} · {{ ucfirst($o->status) }}</span><span>{{ Money::format($o->grand_total) }}</span></a>
+    <a href="{{ route('account.orders.show', $o->reference) }}" class="mt-3 flex justify-between rounded-xl border border-line p-4 text-sm hover:border-accent"><span>{{ $o->reference }} · {{ ucfirst($o->status) }}</span><span>{{ Money::order($o->grand_total, $o) }}</span></a>
 @empty <p class="mt-3 text-sm text-ink-soft">No orders yet. <a class="text-accent" href="{{ route('shop') }}">Start shopping</a>.</p> @endforelse
 @endsection

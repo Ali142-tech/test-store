@@ -96,7 +96,7 @@
             <h2 class="font-semibold">6. Review order</h2>
             <ul class="mt-4 space-y-3 text-sm">
                 @foreach ($calc['lines'] as $l)
-                    <li class="flex items-center justify-between gap-3"><span class="flex items-center gap-3">@if ($img = $l['variant']->imageUrl())<img src="{{ $img }}" alt="" class="photo-bg h-12 w-12 shrink-0 rounded-lg object-contain ring-1 ring-line">@endif<span class="min-w-0 break-words">{{ $l['quantity'] }} × {{ $l['variant']->displayName() }}</span></span><span>{{ Money::format($l['line_total']) }}</span></li>
+                    <li class="flex items-center justify-between gap-3"><span class="flex items-center gap-3">@if ($img = $l['variant']->imageUrl())<img src="{{ $img }}" alt="" class="photo-bg h-12 w-12 shrink-0 rounded-lg object-contain ring-1 ring-line">@endif<span class="min-w-0 break-words">{{ $l['quantity'] }} × {{ $l['variant']->displayName() }}</span></span><span>{{ Money::shop($l['line_total']) }}</span></li>
                 @endforeach
             </ul>
             <template x-for="e in errors"><p class="mt-3 text-sm text-danger" x-text="e" role="alert"></p></template>
@@ -120,7 +120,7 @@ function checkout() {
     return {
         city: @js(old('shipping.city', $default?->city ?? '')), method: @js(old('shipping_method_id')), options: [], errors: [], loading: false, submitting: false, billingSame: true,
         t: { subtotal: @js($calc['subtotal']), discount: @js($calc['discount']), shipping: '0', tax: @js($calc['tax']), total: @js($calc['total']) },
-        money(n) { return @js(\App\Models\StoreSetting::get('currency_symbol', 'Rs')) + ' ' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); },
+        money(n) { const f = @js(\App\Support\Money::js()); return f.symbol + (f.decimals ? '' : ' ') + (Number(n) / f.rate).toLocaleString('en-US', { minimumFractionDigits: f.decimals, maximumFractionDigits: f.decimals }); },
         async refresh() {
             if (!this.city) return;
             this.loading = true;

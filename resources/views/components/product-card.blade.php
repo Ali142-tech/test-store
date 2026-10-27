@@ -35,8 +35,8 @@
             @endif
             @if ($v)
                 <p class="mt-2 flex items-baseline gap-2">
-                    <span class="text-lg font-bold">{{ Money::format($v->currentRetailPrice()) }}</span>
-                    @if ($onSale) <span class="text-sm text-ink-soft line-through">{{ Money::format($v->price) }}</span> @endif
+                    <span class="text-lg font-bold">{{ Money::unit($v->currentRetailPrice()) }}</span>
+                    @if ($onSale) <span class="text-sm text-ink-soft line-through">{{ Money::unit($v->price) }}</span> @endif
                 </p>
             @endif
         </div>

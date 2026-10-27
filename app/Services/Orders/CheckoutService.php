@@ -79,6 +79,8 @@ class CheckoutService
                     'email' => $data['email'], 'phone' => $data['phone'],
                     'status' => 'pending', 'payment_status' => 'unpaid', 'payment_method' => $data['payment_method'],
                     'currency' => \App\Models\StoreSetting::get('currency', 'PKR'),
+                    // what the customer saw: amounts stay PKR, these only decide how the order is displayed
+                    'display_currency' => \App\Support\Region::currency(), 'display_rate' => \App\Support\Region::rate(),
                     'subtotal' => $calc['subtotal'], 'discount_total' => $calc['discount'], 'shipping_total' => $calc['shipping'],
                     'tax_total' => $calc['tax'], 'grand_total' => $calc['total'],
                     'coupon_code' => $calc['coupon'],

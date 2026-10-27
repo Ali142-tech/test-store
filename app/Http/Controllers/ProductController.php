@@ -32,12 +32,12 @@ class ProductController extends Controller
             'images' => $gallery($v->id),
             'sku' => $v->sku,
             'price' => $prices->resolve($v, 1, $user)['price'],
-            'regular_price' => (string) $v->price,
+            'regular_price' => $prices->withFee((string) $v->price),
             'on_sale' => $v->onSale(),
             'available' => $v->available(),
             // Tier table is empty unless the user is an approved wholesale buyer (enforced in PriceResolver).
             'tiers' => $prices->visibleTiers($v, $user)->map(fn ($t) => [
-                'min' => $t->min_quantity, 'max' => $t->max_quantity, 'price' => (string) $t->price,
+                'min' => $t->min_quantity, 'max' => $t->max_quantity, 'price' => $prices->withFee((string) $t->price),
             ])->values(),
             'moq' => $prices->minimumQuantity($v, $user),
         ])->values();

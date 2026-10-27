@@ -4,6 +4,7 @@ namespace App\Services\Pricing;
 
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Support\Region;
 
 /**
  * Single server-side authority for unit prices.
@@ -33,14 +34,20 @@ class PriceResolver
                 ->first();
 
             if ($tier && bccomp((string) $tier->price, $variant->currentRetailPrice(), 2) <= 0) {
-                return ['price' => (string) $tier->price, 'source' => 'tier'];
+                return ['price' => $this->withFee((string) $tier->price), 'source' => 'tier'];
             }
         }
 
         return [
-            'price' => $variant->currentRetailPrice(),
+            'price' => $this->withFee($variant->currentRetailPrice()),
             'source' => $variant->onSale() ? 'sale' : 'regular',
         ];
+    }
+
+    /** International visitors (USD/GBP/EUR regions) pay a per-unit fee on top of the catalogue price; nobody else does. */
+    public function withFee(string $price): string
+    {
+        return bcadd($price, number_format(Region::extraPkr(), 2, '.', ''), 2);
     }
 
     /** Minimum quantity this user must buy of the variant (MOQ only binds approved wholesale buyers). */

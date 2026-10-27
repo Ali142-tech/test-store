@@ -11,8 +11,8 @@
         <tbody class="divide-y divide-line">
         @foreach ($quote->items as $i)
             <tr><td class="py-3">{{ $i->variant->product->name }} <span class="text-ink-soft">{{ $i->variant->name }}</span><span class="block text-xs text-ink-soft">{{ $i->variant->sku }}</span></td>
-                <td>{{ $i->quantity }}</td><td>{{ $i->target_price ? Money::format($i->target_price) : '-' }}</td>
-                <td class="text-right">{{ $i->quoted_price !== null ? Money::format($i->quoted_price) : 'Awaiting quote' }}</td></tr>
+                <td>{{ $i->quantity }}</td><td>{{ $i->target_price ? Money::shop($i->target_price) : '-' }}</td>
+                <td class="text-right">{{ $i->quoted_price !== null ? Money::shop($i->quoted_price) : 'Awaiting quote' }}</td></tr>
         @endforeach
         </tbody>
     </table>

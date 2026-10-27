@@ -1,0 +1,222 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AdminPanelTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit renders the dashboard, settings and every resource list page for a Super Admin[39m[90m                          [39m [90m20.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders every create and edit page that exists for a Super Admin[39m[90m                                         [39m [90m6.52s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps customers and guests out of the admin panel[39m[90m                                                        [39m [90m0.70s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Customer Support', 'App\Filament\Resour[39m[90m…[39m [90m1.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Customer Support', 'App\Filament\Resour[39m[90m…[39m [90m0.71s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Customer Support', 'App\Filament\Resour[39m[90m…[39m [90m0.55s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Customer Support', 'App\Filament\Resour[39m[90m…[39m [90m1.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Inventory Manager', 'App\Filament\Resou[39m[90m…[39m [90m1.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Inventory Manager', 'App\Filament\Resou[39m[90m…[39m [90m0.54s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Inventory Manager', 'App\Filament\Resou[39m[90m…[39m [90m0.48s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Order Manager', 'App\Filament\Resources[39m[90m…[39m [90m0.73s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Order Manager', 'App\Filament\Resources[39m[90m…[39m [90m0.68s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Order Manager', 'App\Filament\Resources[39m[90m…[39m [90m0.98s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Wholesale Manager', 'App\Filament\Resou[39m[90m…[39m [90m0.72s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Wholesale Manager', 'App\Filament\Resou[39m[90m…[39m [90m0.71s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Wholesale Manager', 'App\Filament\Resou[39m[90m…[39m [90m0.60s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Store Manager', 'App\Filament\Resources[39m[90m…[39m [90m0.89s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Store Manager', 'App\Filament\Resources[39m[90m…[39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces role permissions on resource pages (server-side) with ('Store Manager', 'App\Filament\Resources[39m[90m…[39m [90m0.82s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit limits the settings page to staff with manage settings[39m[90m                                                   [39m [90m0.95s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit serves wholesale documents only to authorised staff[39m[90m                                                      [39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not expose the private documents directory over the public web root[39m[90m                                 [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit signs staff in through the real admin login form, and rejects bad passwords and customers[39m[90m                [39m [90m1.38s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AdminWorkflowTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit approves a wholesale application: grants access, emails the customer, audits it[39m[90m                          [39m [90m1.79s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejecting a previously approved application removes wholesale access[39m[90m                                     [39m [90m2.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not let non-wholesale staff approve applications[39m[90m                                                    [39m [90m0.83s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit lets an order manager move an order through its lifecycle and verify a bank transfer[39m[90m                     [39m [90m4.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid status jumps from the admin UI[39m[90m                                                           [39m [90m1.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit restricts refunds to staff with the refund permission[39m[90m                                                    [39m [90m1.95s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit sends a quote with negotiated prices and shipping, and conversion honours both[39m[90m                           [39m [90m1.93s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit adjusts stock only through audited movements and never below zero[39m[90m                                        [39m [90m1.98s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit lets only authorised staff change prices and see cost prices[39m[90m                                             [39m [90m3.69s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit hides cost price from staff without the permission[39m[90m                                                       [39m [90m0.96s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit records a slug redirect when a product slug changes, and returns 410 for archived products[39m[90m               [39m [90m0.89s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit moderates reviews[39m[90m                                                                                        [39m [90m1.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit saves store settings and audits the change[39m[90m                                                               [39m [90m1.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit stops customer support from editing staff accounts or deactivating admins[39m[90m                                [39m [90m1.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit computes dashboard revenue from received payments only[39m[90m                                                   [39m [90m1.14s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AuthTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit registers a retail customer, sends a verification email, and logs them in[39m[90m                                [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit validates registration input[39m[90m                                                                             [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit cannot register as wholesale or staff by posting extra fields[39m[90m                                            [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit logs in with valid credentials, rejects bad ones, and blocks deactivated accounts[39m[90m                        [39m [90m0.65s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rate limits repeated failed logins[39m[90m                                                                       [39m [90m1.54s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit sends a reset link without revealing whether the account exists, and resets the password[39m[90m                 [39m [90m0.82s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires verified email for the account area and accepts a signed verification link[39m[90m                      [39m [90m0.66s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit redirects guests away from account pages[39m[90m                                                                 [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit manages profile, addresses and wishlist for the signed-in user only[39m[90m                                      [39m [90m0.85s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit lets only delivered-order customers review a product, and holds reviews for moderation[39m[90m                   [39m [90m1.67s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\CheckoutTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit adds to the cart and shows server-computed totals[39m[90m                                                        [39m [90m0.65s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit refuses to add more than the available stock[39m[90m                                                             [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit ignores any client-submitted price[39m[90m                                                                       [39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit places a COD order: snapshots items, deducts stock, writes movement and history[39m[90m                          [39m [90m0.49s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps historical order prices when the product price changes later[39m[90m                                       [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies free shipping over the threshold[39m[90m                                                                 [39m [90m0.53s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects checkout for a city outside every zone / an invalid shipping method[39m[90m                              [39m [90m0.49s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit validates required checkout fields[39m[90m                                                                       [39m [90m0.71s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit refuses to oversell the last unit across two buyers[39m[90m                                                      [39m [90m0.86s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not create a duplicate order on double submit with the same idempotency key[39m[90m                         [39m [90m0.53s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit creates a pending bank-transfer payment with the reference and instructions[39m[90m                              [39m [90m0.52s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects disabled or unknown payment methods[39m[90m                                                              [39m [90m0.39s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires login when guest checkout is disabled[39m[90m                                                           [39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies a percentage coupon and records usage[39m[90m                                                            [39m [90m0.89s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid, expired, inactive, under-minimum and exhausted coupons with dataset "expired"[39m[90m           [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid, expired, inactive, under-minimum and exhausted coupons with dataset "future"[39m[90m            [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid, expired, inactive, under-minimum and exhausted coupons with dataset "inactive"[39m[90m          [39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid, expired, inactive, under-minimum and exhausted coupons with dataset "min spend"[39m[90m         [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid, expired, inactive, under-minimum and exhausted coupons with dataset "exhausted"[39m[90m         [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid, expired, inactive, under-minimum and exhausted coupons with dataset "wholesale only"[39m[90m    [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit caps fixed discounts at the goods total and honours max discount[39m[90m                                         [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit gives free shipping with a free-shipping coupon[39m[90m                                                          [39m [90m0.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit merges the guest cart into the account cart on login[39m[90m                                                     [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces valid order status transitions[39m[90m                                                                  [39m [90m0.49s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit restores stock and coupon usage when an order is cancelled, exactly once[39m[90m                                 [39m [90m0.54s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit marks COD payments paid on delivery[39m[90m                                                                      [39m [90m0.63s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit verifies a bank transfer, confirms the order and then supports partial then full refund[39m[90m                  [39m [90m0.60s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit refuses to refund unpaid orders[39m[90m                                                                          [39m [90m0.47s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows a customer only their own orders[39m[90m                                                                   [39m [90m0.77s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit lets a guest see their order only via the just-placed session, a signed link, or reference+email lookup[39m[90m  [39m [90m0.74s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows the product photo (colour-specific when available) in the cart and checkout[39m[90m                        [39m [90m0.62s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit hides bank transfer until a bank account number is configured, and shows the account at checkout once it[39m[90m…[39m [90m0.50s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ColoursReviewsAndPoliciesTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit gives every colour its own gallery, price and swatch on the product page[39m[90m                                 [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows colour dots on product cards for multi-colour products only[39m[90m                                        [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit is not marked out of stock when only some colours are sold out[39m[90m                                           [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit never shows reviews or links from other stores[39m[90m                                                           [39m [90m1.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit seeds complete policy pages that render with live store details[39m[90m                                          [39m [90m0.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit falls back to the contact page when no contact email is configured, and keeps admin edits[39m[90m                [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit offers the review form on the product page only to customers who received the product[39m[90m                    [39m [90m0.86s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit labels sample reviews, keeps them out of structured data, and can purge them without touching real ones[39m[90m  [39m [90m0.50s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit never seeds sample reviews in production[39m[90m                                                                 [39m [90m0.11s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\CreateAdminCommandTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit creates a verified Super Admin who can open the panel, using a hidden password prompt[39m[90m                    [39m [90m2.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects weak passwords, mismatches and bad emails without creating anything[39m[90m                              [39m [90m0.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit asks before upgrading an existing account and never silently changes it[39m[90m                                  [39m [90m0.48s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MailFailureTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit still registers a customer when the mail server is down[39m[90m                                                  [39m [90m2.92s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit tells the customer gently when the verification email cannot be resent[39m[90m                                   [39m [90m3.45s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit still places the order, and keeps the order, when the confirmation email fails[39m[90m                           [39m [90m3.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not reveal mail problems on password reset[39m[90m                                                          [39m [90m3.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit still completes admin approvals, quotes and status changes when mail fails[39m[90m                               [39m [90m7.62s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit logs the mail failure instead of swallowing it silently[39m[90m                                                  [39m [90m3.00s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MarketingAndSeoTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit derives bundle availability from its components[39m[90m                                                          [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit deducts component stock when a bundle is sold and restores it on cancellation[39m[90m                            [39m [90m0.65s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit serves a sitemap listing only public, active pages, and a robots.txt that blocks private areas[39m[90m           [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit emits product structured data with price but no fake rating, and adds rating only with real reviews[39m[90m      [39m [90m0.54s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit marks private pages noindex and never caches them publicly[39m[90m                                               [39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows a genuine-reviews section only once approved reviews exist[39m[90m                                         [39m [90m0.73s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit tracks recently viewed products per session[39m[90m                                                              [39m [90m0.78s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit subscribes to the newsletter once, honours unsubscribe, and blocks bots via honeypot[39m[90m                     [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit stores contact messages and flags wholesale leads[39m[90m                                                        [39m [90m0.51s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit sends abandoned-cart reminders only to consenting, idle, signed-in customers and only once[39m[90m               [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit expires overdue quotes via the scheduled command[39m[90m                                                         [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit registers the scheduled jobs[39m[90m                                                                             [39m [90m0.20s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit sanitises admin-authored page HTML at render time[39m[90m                                                        [39m [90m0.63s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PaymentWebhookTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit marks the payment and order paid on a valid successful callback[39m[90m                                          [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit is idempotent: a replayed webhook changes nothing[39m[90m                                                        [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects wrong amounts, wrong currency, and unknown order references[39m[90m                                      [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit records failed payments without paying the order[39m[90m                                                         [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not expose unconfigured online gateways as checkout options[39m[90m                                         [39m [90m0.27s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PricingTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit charges retail price to guests and retail customers regardless of quantity[39m[90m                               [39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies quantity tiers for approved wholesale users with (1, '1000.00')[39m[90m                                  [39m [90m0.17s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies quantity tiers for approved wholesale users with (9, '1000.00')[39m[90m                                  [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies quantity tiers for approved wholesale users with (10, '900.00')[39m[90m                                  [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies quantity tiers for approved wholesale users with (49, '900.00')[39m[90m                                  [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies quantity tiers for approved wholesale users with (50, '800.00')[39m[90m                                  [39m [90m0.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies quantity tiers for approved wholesale users with (100, '700.00')[39m[90m                                 [39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies quantity tiers for approved wholesale users with (500, '700.00')[39m[90m                                 [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit denies wholesale prices to pending or rejected wholesale applicants with ('pending')[39m[90m                     [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit denies wholesale prices to pending or rejected wholesale applicants with ('rejected')[39m[90m                    [39m [90m0.18s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not apply tiers to products that are not wholesale enabled[39m[90m                                          [39m [90m0.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit prefers a negotiated price over tiers and ignores expired ones[39m[90m                                           [39m [90m0.27s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit uses the sale price only inside its schedule[39m[90m                                                             [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces minimum order quantity only for approved wholesale buyers[39m[90m                                       [39m [90m0.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit never exposes tier tables to non-wholesale users[39m[90m                                                         [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit cannot self-promote to wholesale through mass assignment[39m[90m                                                 [39m [90m0.37s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\RegionCurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit keeps Pakistan and unknown regions in PKR with no fee[39m[90m                                                    [39m [90m0.91s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows US and Canada visitors dollars: PKR price / rate + the $30 fee[39m[90m                                     [39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows the UK pounds and eurozone countries euros, with the same $30 fee converted[39m[90m                        [39m [90m0.65s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not let a visitor pick their own currency in production[39m[90m                                             [39m [90m0.87s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit uses the admin-set rate and fee[39m[90m                                                                          [39m [90m0.75s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit charges the fee server-side: cart, order and payment stay in PKR and include it[39m[90m                          [39m [90m0.90s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not touch prices for Pakistani orders[39m[90m                                                               [39m [90m0.85s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit exposes the fee only through Region for international visitors[39m[90m                                           [39m [90m0.42s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\StockServiceTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit records a movement for every stock change[39m[90m                                                                [39m [90m0.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit refuses to oversell and leaves stock untouched[39m[90m                                                           [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows selling exactly the remaining stock but not one more[39m[90m                                              [39m [90m0.19s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\StorefrontTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit renders the main storefront pages with ('/')[39m[90m                                                             [39m [90m2.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders the main storefront pages with ('/shop')[39m[90m                                                         [39m [90m1.66s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders the main storefront pages with ('/deals')[39m[90m                                                        [39m [90m1.61s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders the main storefront pages with ('/new-arrivals')[39m[90m                                                 [39m [90m1.61s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders the main storefront pages with ('/best-sellers')[39m[90m                                                 [39m [90m1.60s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders the main storefront pages with ('/faqs')[39m[90m                                                         [39m [90m1.86s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders the main storefront pages with ('/pages/about')[39m[90m                                                  [39m [90m3.21s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders the main storefront pages with ('/search?q=case')[39m[90m                                                [39m [90m2.68s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit renders category, brand, device and product pages[39m[90m                                                        [39m [90m1.77s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 404 for unknown and draft products, and 410 Gone for archived ones[39m[90m                               [39m [90m2.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit hides draft products from listings and search[39m[90m                                                            [39m [90m1.60s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit searches by name, SKU and compatible phone model[39m[90m                                                         [39m [90m2.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit filters in-stock and sorts by price without errors[39m[90m                                                       [39m [90m2.44s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid filter input[39m[90m                                                                             [39m [90m1.84s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows an empty state when nothing matches[39m[90m                                                                [39m [90m2.75s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not show wholesale tier prices to guests on the product page[39m[90m                                        [39m [90m3.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps cost price out of the page source[39m[90m                                                                  [39m [90m3.26s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows no fake rating when a product has no reviews[39m[90m                                                       [39m [90m1.19s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit only lets active staff into the admin panel[39m[90m                                                              [39m [90m1.76s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit gives phone users a sign-in icon, a drawer with account actions, and a search toggle[39m[90m                     [39m [90m1.79s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit shows account links in the drawer for signed-in customers[39m[90m                                                [39m [90m1.79s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit links to the admin login from the footer[39m[90m                                                                 [39m [90m1.71s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit ships a light/dark theme: pre-paint script, toggle button, dark tokens in the built CSS[39m[90m                  [39m [90m1.84s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit has an up-to-date built front end that is safe to commit and deploy[39m[90m                                      [39m [90m1.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps the header usable with a very long store name (logo truncates, icons never pushed off-screen)[39m[90m      [39m [90m1.78s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\WholesaleTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit registers a wholesale applicant as a RETAIL user with a pending application[39m[90m                              [39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects dangerous or oversized verification documents with ('shell.php', 10, 'application/x-php')[39m[90m        [39m [90m0.41s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects dangerous or oversized verification documents with ('malware.exe', 10, 'application/octet-stream[39m[90m…[39m [90m0.36s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects dangerous or oversized verification documents with ('huge.pdf', 9000, 'application/pdf')[39m[90m         [39m [90m0.35s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not let a user apply twice or self-approve via the form[39m[90m                                             [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks everyone but approved wholesale buyers from wholesale endpoints with ('get', '/wholesale/bulk-ord[39m[90m…[39m [90m0.51s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks everyone but approved wholesale buyers from wholesale endpoints with ('get', '/wholesale/quotes')[39m[90m [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks everyone but approved wholesale buyers from wholesale endpoints with ('get', '/wholesale/quotes/n[39m[90m…[39m [90m0.39s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks everyone but approved wholesale buyers from wholesale endpoints with ('get', '/wholesale/bulk-ord[39m[90m…[39m [90m0.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not leak tier prices through the bulk price API to retail users[39m[90m                                     [39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps a wholesale user as retail priced until approved, then tier priced[39m[90m                                 [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces minimum order quantity server-side for wholesale buyers only[39m[90m                                    [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces the minimum wholesale order value at checkout[39m[90m                                                   [39m [90m0.47s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit hides COD from wholesale buyers unless enabled and blocks retail shipping rates[39m[90m                          [39m [90m0.33s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies negotiated prices for the customer only[39m[90m                                                          [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit adds valid bulk lines from text and CSV and reports the invalid ones[39m[90m                                     [39m [90m0.50s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects CSV files of the wrong type[39m[90m                                                                      [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit runs the full quote lifecycle and converts to an order at the agreed price[39m[90m                               [39m [90m3.55s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit protects quote prices from price tampering at checkout[39m[90m                                                   [39m [90m0.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not let one customer see, accept or check out another customer's quote[39m[90m                              [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit expires quotes and blocks acceptance and checkout after expiry[39m[90m                                           [39m [90m1.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit only quotes active wholesale-enabled products[39m[90m                                                            [39m [90m0.50s[39m  
+
+  [90mTests:[39m    [32;1m190 passed[39;22m[90m (809 assertions)[39m
+  [90mDuration:[39m [39m210.09s[39m
+
