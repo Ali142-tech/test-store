@@ -12,6 +12,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ isset($metaTitle) ? $metaTitle.' | '.$storeName : $storeName.' - Premium gaming gear, retail & wholesale' }}</title>
     <meta name="description" content="{{ $metaDescription ?? 'Consoles, controllers, gaming keyboards, mice, headsets and monitors. Retail and wholesale.' }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <meta name="theme-color" content="#6d3df5">
     <link rel="canonical" href="{{ $canonical ?? url()->current() }}">
     @if (request()->routeIs('cart.*', 'checkout.*', 'order.*', 'account.*', 'wholesale.*', 'quotes.*', 'login', 'register', 'search')) <meta name="robots" content="noindex,follow"> @endif
     <meta property="og:title" content="{{ $metaTitle ?? $storeName }}">
@@ -60,17 +65,17 @@
             <button class="lg:hidden -ml-2 p-2" @click="menu = true" aria-label="Open menu">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
             </button>
-            <a href="{{ route('home') }}" class="min-w-0 flex-1 truncate text-lg font-bold tracking-tight sm:text-xl md:flex-none" title="{{ $storeName }}">{{ $storeName }}<span class="text-accent">.</span></a>
+            <a href="{{ route('home') }}" class="flex min-w-0 flex-1 items-center gap-2.5 text-lg font-bold tracking-tight sm:text-xl md:flex-none" title="{{ $storeName }}"><img src="{{ asset('logo.svg') }}" alt="" width="34" height="34" class="h-8 w-8 shrink-0 sm:h-9 sm:w-9"><span class="min-w-0 truncate">{{ $storeName }}<span class="text-accent">.</span></span></a>
 
-            <nav class="ml-6 hidden lg:flex items-center gap-6 text-sm font-medium" aria-label="Main">
+            <nav class="ml-6 hidden shrink-0 items-center gap-5 whitespace-nowrap text-sm font-medium lg:flex" aria-label="Main">
                 <a href="{{ route('shop') }}" class="hover:text-accent">Shop</a>
-                @foreach ($navCategories->take(4) as $c)
-                    <a href="{{ route('category', $c) }}" class="hover:text-accent">{{ $c->name }}</a>
+                @foreach ($navCategories->take(3) as $c)
+                    <a href="{{ route('category', $c) }}" class="hover:text-accent {{ $loop->iteration > 2 ? 'hidden xl:inline' : '' }}">{{ $c->name }}</a>
                 @endforeach
                 <a href="{{ route('deals') }}" class="text-accent">Deals</a>
             </nav>
 
-            <form action="{{ route('search') }}" method="get" class="ml-auto hidden max-w-md flex-1 md:block" role="search">
+            <form action="{{ route('search') }}" method="get" class="ml-auto hidden min-w-[9rem] max-w-md flex-1 md:block" role="search">
                 <label class="sr-only" for="q">Search</label>
                 <input id="q" name="q" value="{{ request('q') }}" type="search" placeholder="Search consoles, keyboards, headsets or SKU"
                        class="field !rounded-full !py-2.5 bg-mist border-transparent">
@@ -111,7 +116,7 @@
         <div class="absolute inset-0 bg-black/40" @click="menu = false"></div>
         <aside class="absolute left-0 top-0 h-full w-80 max-w-[85%] bg-surface p-6 overflow-y-auto" x-transition>
             <div class="flex justify-between items-center mb-6">
-                <span class="min-w-0 break-words text-lg font-bold">{{ $storeName }}</span>
+                <span class="flex min-w-0 items-center gap-2 break-words text-lg font-bold"><img src="{{ asset('logo.svg') }}" alt="" width="28" height="28" class="h-7 w-7 shrink-0">{{ $storeName }}</span>
                 <button @click="menu = false" aria-label="Close menu" class="p-2">✕</button>
             </div>
             <div class="mb-4 grid gap-2 rounded-2xl bg-mist p-4 text-sm">
@@ -165,7 +170,7 @@
     <footer class="bg-deep text-white">
         <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4 text-sm">
             <div>
-                <p class="break-words text-lg font-bold">{{ $storeName }}<span class="text-accent">.</span></p>
+                <p class="flex items-center gap-2 break-words text-lg font-bold"><img src="{{ asset('logo.svg') }}" alt="" width="30" height="30" class="h-8 w-8 shrink-0">{{ $storeName }}<span class="text-accent">.</span></p>
                 <p class="mt-3 text-white/60">Premium gaming gear: consoles, keyboards, headsets and more. Retail and wholesale.</p>
             </div>
             <div>

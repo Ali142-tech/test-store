@@ -142,6 +142,7 @@ it('keeps the header usable with a very long store name (logo truncates, icons n
     $html = $this->get('/')->getContent();
 
     expect($html)->toContain('PakistanMobileAccessoriesWholesaleStore')
-        ->and($html)->toMatch('/<a href="[^"]*" class="min-w-0 flex-1 truncate[^"]*"/')   // logo can shrink and ellipsis
+        ->and($html)->toMatch('/<a href="[^"]*" class="flex min-w-0 flex-1 items-center[^"]*"/')   // logo link can shrink
+        ->and($html)->toMatch('/<span class="min-w-0 truncate">PakistanMobileAccessoriesWholesaleStore/')   // name ellipsises, the mark stays
         ->and($html)->toContain('ml-auto flex shrink-0');                                  // icon group never shrinks away
 });
