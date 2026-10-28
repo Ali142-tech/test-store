@@ -7,7 +7,7 @@
         <x-field name="password" label="Password" type="password" required autocomplete="current-password" />
         <div class="flex items-center justify-between text-sm">
             <label class="flex items-center gap-2"><input type="checkbox" name="remember" value="1"> Remember me</label>
-            <a href="{{ route('password.request') }}" class="text-accent">Forgot password?</a>
+            @if (\App\Support\SafeMail::enabled())<a href="{{ route('password.request') }}" class="text-accent">Forgot password?</a>@endif
         </div>
         <button class="btn btn-primary w-full">Sign in</button>
     </form>

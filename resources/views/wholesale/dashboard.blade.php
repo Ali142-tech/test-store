@@ -5,7 +5,7 @@
     <h1 class="text-2xl font-semibold">Wholesale · {{ $application->business_name }}</h1>
     <p class="mt-3">Application status:
         <span class="chip {{ $application->status === 'approved' ? '!border-ok text-ok' : ($application->status === 'rejected' ? '!border-danger text-danger' : '') }}">{{ ucfirst($application->status) }}</span></p>
-    @if ($application->status === 'pending')<p class="mt-2 text-sm text-ink-soft">We are reviewing your application. You will be emailed once it is approved.</p>@endif
+    @if ($application->status === 'pending')<p class="mt-2 text-sm text-ink-soft">We are reviewing your application. Your wholesale pricing appears here once it is approved.</p>@endif
     @if ($application->status === 'rejected')<p class="mt-2 text-sm text-ink-soft">Your application was not approved. @if ($application->admin_notes) Reason: {{ $application->admin_notes }} @endif Please <a class="text-accent" href="{{ route('contact') }}">contact us</a>.</p>@endif
 
     @if ($approved)

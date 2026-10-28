@@ -15,6 +15,12 @@ class LowStockAlert extends Command
 
     public function handle(): int
     {
+        if (! \App\Support\SafeMail::enabled()) {
+            $this->warn('Email is switched off (STORE_MAIL_ENABLED=false): nothing sent.');
+
+            return self::SUCCESS;
+        }
+
         $rows = ProductVariant::with('product')->where('is_active', true)
             ->whereHas('product', fn ($q) => $q->where('type', 'simple')->where('status', 'active'))
             ->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->orderBy('stock_quantity')->get();

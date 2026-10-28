@@ -3,7 +3,7 @@
 <h1 class="text-2xl font-semibold">Profile</h1>
 <form method="post" action="{{ route('account.profile.update') }}" class="mt-6 grid max-w-xl gap-4">@csrf @method('PUT')
     <x-field name="name" label="Name" :value="auth()->user()->name" required />
-    <x-field name="email" label="Email" type="email" :value="auth()->user()->email" required hint="Changing your email requires re-verification." />
+    <x-field name="email" label="Email" type="email" :value="auth()->user()->email" required />
     <x-field name="phone" label="Phone" :value="auth()->user()->phone" />
     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="marketing_consent" value="1" @checked(auth()->user()->marketing_consent)> Send me offers and news</label>
     <button class="btn btn-primary w-fit">Save</button>

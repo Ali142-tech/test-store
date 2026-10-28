@@ -3,7 +3,6 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordController;
-use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ContactController;
@@ -56,11 +55,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [PasswordController::class, 'reset'])->middleware('throttle:10,1')->name('password.update');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
-Route::middleware('auth')->group(function () {
-    Route::get('/email/verify', [VerificationController::class, 'notice'])->name('verification.notice');
-    Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
-    Route::post('/email/verification-notification', [VerificationController::class, 'resend'])->middleware('throttle:6,1')->name('verification.send');
-});
 
 // ---- Cart & checkout (guests allowed; checkout honours the guest_checkout setting) ----
 Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
@@ -84,7 +78,7 @@ Route::get('/order/{order:reference}', [OrderController::class, 'show'])->name('
 Route::get('/order/{order:reference}/invoice', [OrderController::class, 'invoice'])->name('order.invoice');
 
 // ---- Customer account ----
-Route::middleware(['auth', 'verified'])->prefix('account')->name('account.')->controller(AccountController::class)->group(function () {
+Route::middleware('auth')->prefix('account')->name('account.')->controller(AccountController::class)->group(function () {
     Route::get('/', 'dashboard')->name('dashboard');
     Route::get('/orders', 'orders')->name('orders');
     Route::get('/orders/{reference}', 'order')->name('orders.show');

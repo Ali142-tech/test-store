@@ -16,6 +16,12 @@ class SendCartReminders extends Command
 
     public function handle(): int
     {
+        if (! \App\Support\SafeMail::enabled()) {
+            $this->warn('Email is switched off (STORE_MAIL_ENABLED=false): nothing sent.');
+
+            return self::SUCCESS;
+        }
+
         $n = 0;
         Cart::query()->whereNotNull('user_id')->whereNull('reminded_at')
             ->where('last_activity_at', '<', now()->subHours((int) $this->option('hours')))

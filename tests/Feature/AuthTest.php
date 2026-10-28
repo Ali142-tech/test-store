@@ -6,14 +6,14 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 
-it('registers a retail customer, sends a verification email, and logs them in', function () {
+it('registers a retail customer without any email verification and logs them in', function () {
     Notification::fake();
     $this->post('/register', ['name' => 'Sara', 'email' => 'sara@example.com', 'password' => 'password123', 'password_confirmation' => 'password123'])
-        ->assertRedirect('/email/verify');
+        ->assertRedirect('/account');
 
     $u = User::where('email', 'sara@example.com')->first();
     expect($u->customer_type)->toBe('retail')->and($u->password)->not->toBe('password123')->and($u->marketing_consent)->toBeFalse();
-    Notification::assertSentTo($u, VerifyEmail::class);
+    Notification::assertNothingSent();
     $this->assertAuthenticatedAs($u);
 });
 
@@ -66,13 +66,10 @@ it('sends a reset link without revealing whether the account exists, and resets 
     expect(\Illuminate\Support\Facades\Hash::check('newpassword1', $u->fresh()->password))->toBeTrue();
 });
 
-it('requires verified email for the account area and accepts a signed verification link', function () {
+it('lets a new, unverified customer use the account area straight away', function () {
     $u = User::factory()->unverified()->create();
-    $this->actingAs($u)->get('/account')->assertRedirect('/email/verify');
-
-    $url = URL::temporarySignedRoute('verification.verify', now()->addHour(), ['id' => $u->id, 'hash' => sha1($u->email)]);
-    $this->actingAs($u)->get($url)->assertRedirect('/account');
-    expect($u->fresh()->hasVerifiedEmail())->toBeTrue();
+    $this->actingAs($u)->get('/account')->assertOk();
+    $this->get('/email/verify')->assertNotFound();
 });
 
 it('redirects guests away from account pages', function () {

@@ -15,6 +15,12 @@ class RequestReviews extends Command
 
     public function handle(): int
     {
+        if (! \App\Support\SafeMail::enabled()) {
+            $this->warn('Email is switched off (STORE_MAIL_ENABLED=false): nothing sent.');
+
+            return self::SUCCESS;
+        }
+
         $n = 0;
         Order::where('status', 'delivered')->whereNull('review_requested_at')->whereNotNull('user_id')
             ->whereHas('histories', fn ($q) => $q->where('to_status', 'delivered')->where('created_at', '<', now()->subDays((int) $this->option('days'))))

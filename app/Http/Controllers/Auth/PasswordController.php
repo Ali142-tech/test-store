@@ -13,13 +13,22 @@ use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class PasswordController extends Controller
 {
+    /** Password reset works by email: unavailable while the store has no email service. */
+    private function requireMail(): void
+    {
+        abort_unless(SafeMail::enabled(), 404);
+    }
+
     public function showForgot()
     {
+        $this->requireMail();
+
         return view('auth.forgot');
     }
 
     public function sendLink(Request $request)
     {
+        $this->requireMail();
         $request->validate(['email' => 'required|email']);
         SafeMail::run(fn () => Password::sendResetLink($request->only('email')));
 
@@ -29,11 +38,13 @@ class PasswordController extends Controller
 
     public function showReset(Request $request, string $token)
     {
+        $this->requireMail();
         return view('auth.reset', ['token' => $token, 'email' => $request->query('email')]);
     }
 
     public function reset(Request $request)
     {
+        $this->requireMail();
         $data = $request->validate([
             'token' => 'required', 'email' => 'required|email',
             'password' => ['required', 'confirmed', PasswordRule::min(8)],

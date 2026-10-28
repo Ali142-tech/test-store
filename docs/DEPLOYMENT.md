@@ -107,3 +107,7 @@ Prices are stored and charged in PKR. Visitors from the USA/Canada see USD, the 
 - Country detection: uses the `CF-IPCountry` header when the site is behind Cloudflare (recommended, free, instant); otherwise it looks the visitor's IP up once a day via ip-api.com and caches the answer. If detection fails the visitor simply sees PKR.
 - Do not cache whole HTML pages at a CDN (prices depend on the visitor's country).
 - Shipping rates and the free-shipping threshold are still PKR amounts, converted for display.
+
+## Email is switched off by default
+
+The store currently has no email service. With `STORE_MAIL_ENABLED=false` (the default) nothing is ever sent: no order or status emails, no wholesale/quote emails, no cart/review/low-stock mails, and password reset is hidden (the pages return 404). Customers register and sign in with email + password only (no email verification). To turn email on later: set `STORE_MAIL_ENABLED=true`, fill in the `MAIL_*` settings, then `php artisan config:cache`. Until then, an admin can set a customer's password in Admin > Users.

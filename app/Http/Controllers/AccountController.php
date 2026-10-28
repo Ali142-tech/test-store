@@ -58,14 +58,8 @@ class AccountController extends Controller
         ]);
         $user = $request->user();
         $user->fill(['name' => $data['name'], 'phone' => $data['phone'] ?? null, 'marketing_consent' => $request->boolean('marketing_consent')]);
-        if ($data['email'] !== $user->email) {
-            $user->email = $data['email'];
-            $user->email_verified_at = null;
-            $user->save();
-            SafeMail::run(fn () => $user->sendEmailVerificationNotification());
-        } else {
-            $user->save();
-        }
+        $user->email = $data['email'];
+        $user->save();
 
         return back()->with('status', 'Profile updated.');
     }

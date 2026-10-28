@@ -10,8 +10,17 @@ use Throwable;
  */
 class SafeMail
 {
+    public static function enabled(): bool
+    {
+        return (bool) config('store.mail_enabled');
+    }
+
     public static function run(callable $send): bool
     {
+        if (! self::enabled()) {
+            return false; // no email service configured: do not even try
+        }
+
         try {
             $send();
 

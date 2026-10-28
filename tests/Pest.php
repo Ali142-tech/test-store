@@ -65,3 +65,6 @@ function staff(string $role): User
 
     return $u->fresh();
 }
+
+// Email is switched off by default in the app; the suite exercises the mail paths with it on (see MailDisabledTest for off).
+uses()->beforeEach(fn () => config(['store.mail_enabled' => true]))->in('Feature');

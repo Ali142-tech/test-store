@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Cart\CartService;
 use App\Support\SafeMail;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -62,7 +61,6 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($data + ['marketing_consent' => $request->boolean('marketing_consent')]);
-        SafeMail::run(fn () => event(new Registered($user))); // verification email: never block sign-up
 
         $guestToken = $request->session()->get('cart_token');
         Auth::login($user);
@@ -70,7 +68,7 @@ class AuthController extends Controller
         $this->carts->mergeGuestCart($user, $guestToken);
         $request->session()->forget('cart_token');
 
-        return redirect()->route('verification.notice');
+        return redirect()->route('account.dashboard');
     }
 
     public function logout(Request $request)

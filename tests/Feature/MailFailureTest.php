@@ -14,14 +14,9 @@ beforeEach(function () {
 
 it('still registers a customer when the mail server is down', function () {
     $this->post('/register', ['name' => 'Mail Down', 'email' => 'down@example.com', 'password' => 'password123', 'password_confirmation' => 'password123'])
-        ->assertRedirect(route('verification.notice'));
+        ->assertRedirect(route('account.dashboard'));
     expect(User::where('email', 'down@example.com')->exists())->toBeTrue();
     $this->assertAuthenticated();
-});
-
-it('tells the customer gently when the verification email cannot be resent', function () {
-    $u = User::factory()->unverified()->create();
-    $this->actingAs($u)->post('/email/verification-notification')->assertSessionHas('status', fn ($s) => str_contains($s, 'could not send'));
 });
 
 it('still places the order, and keeps the order, when the confirmation email fails', function () {
@@ -52,6 +47,6 @@ it('still completes admin approvals, quotes and status changes when mail fails',
 
 it('logs the mail failure instead of swallowing it silently', function () {
     \Illuminate\Support\Facades\Log::spy();
-    $this->post('/register', ['name' => 'Log Me', 'email' => 'log@example.com', 'password' => 'password123', 'password_confirmation' => 'password123']);
+    $this->post('/forgot-password', ['email' => User::factory()->create()->email]);
     \Illuminate\Support\Facades\Log::shouldHaveReceived('error')->atLeast()->once();
 });
